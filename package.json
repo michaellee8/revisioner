@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "esformatter": "^0.10.0",
+    "esformatter-flow": "^1.0.1",
     "esformatter-jsx": "^8.0.1",
     "flow-bin": "^0.50.0"
   }

@@ -2189,6 +2189,15 @@ escope@^3.6.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
+esformatter-flow@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/esformatter-flow/-/esformatter-flow-1.0.1.tgz#d5247381bbe80b45ac198bc942187510fa1a77c1"
+  dependencies:
+    lodash.defaultsdeep "^4.0.2"
+    rocambole-indent "^2.0.4"
+    rocambole-token "^1.2.1"
+    rocambole-whitespace "^1.0.0"
+
 esformatter-ignore@^0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/esformatter-ignore/-/esformatter-ignore-0.1.3.tgz#04d3b875bfa49dde004cc58df6f6bbc3c0567f1e"
@@ -4041,6 +4050,10 @@ lodash.cond@^4.3.0:
 lodash.defaults@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/lodash.defaults/-/lodash.defaults-4.2.0.tgz#d09178716ffea4dde9e5fb7b37f6f0802274580c"
+
+lodash.defaultsdeep@^4.0.2:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/lodash.defaultsdeep/-/lodash.defaultsdeep-4.6.0.tgz#bec1024f85b1bd96cbea405b23c14ad6443a6f81"
 
 lodash.memoize@^4.1.2:
   version "4.1.2"
