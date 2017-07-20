@@ -6,28 +6,28 @@ import Divider from 'material-ui/Divider';
 class About extends Component {
   render() {
     return (<Card>
-      <CardHeader
-        title="Michael Lee"
-        subtitle="Author of this app"
-        avatar="/favicon.ico" />
-      <CardTitle
-        title="Revisioner"
-        subtitle="Let LEARNING fun AGAIN" />
-      <CardText>
-        <div>
-          The aim of this app is to provide interactive and interesting elements into learning, such that students can study the trash-like DSE in a bit more interesting environment.
+              <CardHeader
+                          title="Michael Lee"
+                          subtitle="Author of this app"
+                          avatar="/favicon.ico" />
+              <CardTitle
+                         title="Revisioner"
+                         subtitle="Let LEARNING fun AGAIN" />
+              <CardText>
+                <div>
+                  The aim of this app is to provide interactive and interesting elements into learning, such that students can study the trash-like DSE in a bit more interesting environment.
                 </div>
-        <Divider />
-        <div>
-          Still in alpha stage.
+                <Divider />
+                <div>
+                  Still in alpha stage.
                 </div>
-      </CardText>
-      <CardActions>
-        <FlatButton
-          label="Github"
-          href="https://github.com/michaellee8/revisioner" />
-      </CardActions>
-    </Card>)
+              </CardText>
+              <CardActions>
+                <FlatButton
+                            label="Github"
+                            href="https://github.com/michaellee8/revisioner" />
+              </CardActions>
+            </Card>)
   }
 }
 
