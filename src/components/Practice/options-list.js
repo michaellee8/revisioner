@@ -6,7 +6,7 @@ class OptionsList extends Component {
     options: Array<String>,
     onOptionClick: Function
   }
-  constructor() {
+  constructor(props) {
     super(props);
     this.handleOptionClick = this.handleOptionClick.bind(this);
   }
@@ -18,8 +18,12 @@ class OptionsList extends Component {
     return a;
   }
 
+  handleOptionClick(i: number) {
+    this.props.onOptionClick(i);
+  }
+
   render() {
-    const randArr = shuffleArr(this.props.options.map((v, i) => ({
+    const randArr = this.shuffleArr(this.props.options.map((v, i) => ({
       value: v,
       index: i
     })));
@@ -31,10 +35,10 @@ class OptionsList extends Component {
                      } } />)
     );
     return (
-    {
-      elements
-    }
-    );
+      <List>
+        { elements }
+      </List>
+      );
   }
 }
 

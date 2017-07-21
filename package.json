@@ -16,12 +16,15 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "devDependencies": {
     "esformatter": "^0.10.0",
     "esformatter-flow": "^1.0.1",
     "esformatter-jsx": "^8.0.1",
-    "flow-bin": "^0.50.0"
+    "flow-bin": "^0.50.0",
+    "@storybook/react": "^3.1.9"
   }
 }
