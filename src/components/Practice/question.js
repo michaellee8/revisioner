@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card'
 import { List, ListItem } from 'material-ui/List'
-import { OptionsList } from '.\options-list'
+import OptionsList from './options-list'
+import Divider from 'material-ui/Divider'
 
 class Question extends Component {
   constructor(props) {
@@ -16,12 +17,17 @@ class Question extends Component {
     questionType: string,
     questionText: string,
     options: Array<string>,
-    onOptionClick: Function;
+    onOptionClick: Function,
+    shouldRender: boolean,
+    questionNumber: number
   }
-  handleOptionClick(index: number) {
-    this.props.onOptionClick(index);
+  handleOptionClick(index: number, qNumber: number) {
+    this.props.onOptionClick(index, this.props.questionNumber);
   }
   render() {
+    if (!this.props.shouldRender) {
+      return null;
+    }
     return (
       <Card>
         <CardHeader
@@ -32,7 +38,15 @@ class Question extends Component {
           title={ this.props.questionTitle }
           subtitle={ this.props.questionType } />
         <CardText>
-          { this.props.questionText }
+          <div dangerouslySetInnerHTML={ {
+                                           __html: this.props.questionText.replace(/{{([^{}]*)}}/g, (match, p1) => {
+                                             if (p1 === "") {
+                                               return "<span style='text-decoration: underline'>______</span>";
+                                             } else {
+                                               return "<span style='text-decoration: underline;'>_" + p1 + "_</span>"
+                                             }
+                                           })
+                                         } }></div>
           <Divider/>
           <OptionsList
             options={ this.props.options }
