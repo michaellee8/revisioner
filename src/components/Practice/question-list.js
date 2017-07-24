@@ -92,30 +92,38 @@ class QuestionList extends Component {
                     onOptionClick={ this.handleOptionClick }
                     shouldRender={ this.state.shouldRenderQuestion[i] }
                     questionNumber={ i } />)) }
-              <Card>
-                <CardTitle>
-                  Done!
-                </CardTitle>
-                <CardActions>
-                  <IconButton>
-                    <Badge
-                      badgeContent={ this.state.numberOfCorrectAnswers }
-                      primary={ true }>
-                      <CorrectIcon/>
-                    </Badge>
-                  </IconButton>
-                  <IconButton>
-                    <Badge
-                      badgeContent={ this.state.numberOfWrongAnswers }
-                      secondary={ true }>
-                      <WrongIcon/>
-                    </Badge>
-                  </IconButton>
-                  <IconButton onTouchTap={ () => (window.location.reload()) }>
-                    <RefreshIcon/>
-                  </IconButton>
-                </CardActions>
-              </Card>
+              { this.state.QuestionSet.length > 0 ? (
+                <Card>
+                  <CardTitle>
+                    Done!
+                  </CardTitle>
+                  <CardActions>
+                    <IconButton>
+                      <Badge
+                        badgeContent={ this.state.numberOfCorrectAnswers }
+                        primary={ true }>
+                        <CorrectIcon/>
+                      </Badge>
+                    </IconButton>
+                    <IconButton>
+                      <Badge
+                        badgeContent={ this.state.numberOfWrongAnswers }
+                        secondary={ true }>
+                        <WrongIcon/>
+                      </Badge>
+                    </IconButton>
+                    <IconButton onTouchTap={ () => (window.location.reload()) }>
+                      <RefreshIcon/>
+                    </IconButton>
+                  </CardActions>
+                </Card>
+                ) : (
+                <Card>
+                  <CardTitle>
+                    Please wait
+                  </CardTitle>
+                </Card>
+                ) }
               <Snackbar
                 open={ this.state.reflectionOpen }
                 message={ this.state.reflectionMessage }

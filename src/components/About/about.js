@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import FlatButton from 'material-ui/FlatButton';
-import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card';
-import Divider from 'material-ui/Divider';
+import { Card, CardActions, CardHeader, CardTitle, CardText } from 'material-ui/Card';
 
 class About extends Component {
   render() {

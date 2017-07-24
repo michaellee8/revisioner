@@ -3,8 +3,8 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import { Link } from 'react-router-dom'
-import { Switch, Redirect } from 'react-router-dom'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { Switch } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import About from './About/about'
 import Practice from './Practice/practice'
 

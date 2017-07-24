@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card'
-import { List, ListItem } from 'material-ui/List'
+import { Card, CardHeader, CardTitle, CardText } from 'material-ui/Card'
 import OptionsList from './options-list'
-import Divider from 'material-ui/Divider'
 import Paper from 'material-ui/Paper'
 
 class Question extends Component {
