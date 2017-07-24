@@ -2,11 +2,19 @@ import base from '../../base.js';
 import Question from './question'
 import React, { Component } from 'react'
 import Snackbar from 'material-ui/Snackbar'
+import { Card, CardActions, CardTitle } from 'material-ui/Card'
+import CorrectIcon from 'material-ui/svg-icons/action/done'
+import WrongIcon from 'material-ui/svg-icons/content/clear'
+import RefreshIcon from 'material-ui/svg-icons/navigation/refresh'
+import IconButton from 'material-ui/IconButton'
+import Badge from 'material-ui/Badge'
 
 class QuestionList extends Component {
   state: {
     QuestionSet: Array<any>,
-    shouldRenderQuestion: Array<boolean>
+    shouldRenderQuestion: Array<boolean>,
+    numberOfCorrectAnswers: number,
+    numberOfWrongAnswers: number
   }
   props: {
     firebaseEndPoint: string,
@@ -18,7 +26,9 @@ class QuestionList extends Component {
       QuestionSet: [],
       shouldRenderQuestion: [],
       reflectionOpen: false,
-      reflectionText: false
+      reflectionText: "",
+      numberOfCorrectAnswers: 0,
+      numberOfWrongAnswers: 0
     };
     this.handleOptionClick = this.handleOptionClick.bind(this);
   }
@@ -48,11 +58,17 @@ class QuestionList extends Component {
         reflectionOpen: true,
         reflectionMessage: "Correct!"
       });
+      this.setState((prevState, props) => ({
+        numberOfCorrectAnswers: prevState.numberOfCorrectAnswers + 1
+      }));
     } else {
       this.setState({
         reflectionOpen: true,
         reflectionMessage: "Wrong!"
       });
+      this.setState((prevState, props) => ({
+        numberOfWrongAnswers: prevState.numberOfWrongAnswers + 1
+      }));
     }
     this.setState((prevState, props) => {
       var tmp = prevState.shouldRenderQuestion.slice();
@@ -76,6 +92,30 @@ class QuestionList extends Component {
                     onOptionClick={ this.handleOptionClick }
                     shouldRender={ this.state.shouldRenderQuestion[i] }
                     questionNumber={ i } />)) }
+              <Card>
+                <CardTitle>
+                  Done!
+                </CardTitle>
+                <CardActions>
+                  <IconButton>
+                    <Badge
+                      badgeContent={ this.state.numberOfCorrectAnswers }
+                      primary={ true }>
+                      <CorrectIcon/>
+                    </Badge>
+                  </IconButton>
+                  <IconButton>
+                    <Badge
+                      badgeContent={ this.state.numberOfWrongAnswers }
+                      secondary={ true }>
+                      <WrongIcon/>
+                    </Badge>
+                  </IconButton>
+                  <IconButton onTouchTap={ () => (window.location.reload()) }>
+                    <RefreshIcon/>
+                  </IconButton>
+                </CardActions>
+              </Card>
               <Snackbar
                 open={ this.state.reflectionOpen }
                 message={ this.state.reflectionMessage }

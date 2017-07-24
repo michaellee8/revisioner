@@ -3,6 +3,7 @@ import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'm
 import { List, ListItem } from 'material-ui/List'
 import OptionsList from './options-list'
 import Divider from 'material-ui/Divider'
+import Paper from 'material-ui/Paper'
 
 class Question extends Component {
   constructor(props) {
@@ -38,16 +39,21 @@ class Question extends Component {
           title={ this.props.questionTitle }
           subtitle={ this.props.questionType } />
         <CardText>
-          <div dangerouslySetInnerHTML={ {
-                                           __html: this.props.questionText.replace(/{{([^{}]*)}}/g, (match, p1) => {
-                                             if (p1 === "") {
-                                               return "<span style='text-decoration: underline'>______</span>";
-                                             } else {
-                                               return "<span style='text-decoration: underline;'>_" + p1 + "_</span>"
-                                             }
-                                           })
-                                         } }></div>
-          <Divider/>
+          <Paper>
+            <div
+              style={ {
+                        fontSize: "16px"
+                      } }
+              dangerouslySetInnerHTML={ {
+                                          __html: this.props.questionText.replace(/{{([^{}]*)}}/g, (match, p1) => {
+                                            if (p1 === "") {
+                                              return "<span style='text-decoration: underline'>______</span>";
+                                            } else {
+                                              return "<span style='text-decoration: underline;'>_" + p1 + "_</span>"
+                                            }
+                                          })
+                                        } }></div>
+          </Paper>
           <OptionsList
             options={ this.props.options }
             onOptionClick={ this.handleOptionClick } />
