@@ -3,13 +3,14 @@
   "name": "Revisioner",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "192x192",
+      "src": "%PUBLIC_URL%/favicon.ico",
+      "sizes": "144x144",
       "type": "image/png"
     }
   ],
-  "start_url": "./index.html",
+  "start_url": "%PUBLIC_URL%/index.html",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#4B0082",
+  "background_color": "#4B0082",
+  "orientation": "portrait"
 }

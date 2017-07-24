@@ -8,7 +8,7 @@ class About extends Component {
               <CardHeader
                 title="Michael Lee"
                 subtitle="Author of this app"
-                avatar="/favicon.ico" />
+                avatar="%PUBLIC_URL%/favicon.ico" />
               <CardTitle
                 title="Revisioner"
                 subtitle="Let LEARNING fun AGAIN" />
