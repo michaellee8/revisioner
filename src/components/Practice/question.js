@@ -17,16 +17,13 @@ class Question extends Component {
     questionText: string,
     options: Array<string>,
     onOptionClick: Function,
-    shouldRender: boolean,
-    questionNumber: number
+    questionNumber: number,
+    correctOption: number
   }
   handleOptionClick(index: number, qNumber: number) {
     this.props.onOptionClick(index, this.props.questionNumber);
   }
   render() {
-    if (!this.props.shouldRender) {
-      return null;
-    }
     return (
       <Card>
         <CardHeader
@@ -54,7 +51,8 @@ class Question extends Component {
           </Paper>
           <OptionsList
             options={ this.props.options }
-            onOptionClick={ this.handleOptionClick } />
+            onOptionClick={ this.handleOptionClick }
+            correctOption={ this.props.correctOption } />
         </CardText>
       </Card>
       );

@@ -8,11 +8,15 @@ import WrongIcon from 'material-ui/svg-icons/content/clear'
 import RefreshIcon from 'material-ui/svg-icons/navigation/refresh'
 import IconButton from 'material-ui/IconButton'
 import Badge from 'material-ui/Badge'
+import LinearProgress from 'material-ui/LinearProgress'
+import { List, ListItem } from 'material-ui/List'
 
 class QuestionList extends Component {
   state: {
     QuestionSet: Array<any>,
     shouldRenderQuestion: Array<boolean>,
+    reflectionOpen: boolean,
+    reflectionText: string,
     numberOfCorrectAnswers: number,
     numberOfWrongAnswers: number
   }
@@ -56,7 +60,7 @@ class QuestionList extends Component {
     if (this.state.QuestionSet[questionNumber].q.correctOption === index) {
       this.setState({
         reflectionOpen: true,
-        reflectionMessage: "Correct!"
+        reflectionText: "Correct!"
       });
       this.setState((prevState, props) => ({
         numberOfCorrectAnswers: prevState.numberOfCorrectAnswers + 1
@@ -64,7 +68,7 @@ class QuestionList extends Component {
     } else {
       this.setState({
         reflectionOpen: true,
-        reflectionMessage: "Wrong!"
+        reflectionText: "Wrong!"
       });
       this.setState((prevState, props) => ({
         numberOfWrongAnswers: prevState.numberOfWrongAnswers + 1
@@ -80,53 +84,61 @@ class QuestionList extends Component {
   }
   render() {
     return (<div>
-              { this.state.QuestionSet.map((q, i) => (
-                  <Question
-                    authorName={ this.props.teacher.name }
-                    authorIntro={ this.props.teacher.intro }
-                    authorAvatar={ this.props.teacher.avatar }
-                    questionTitle={ q.q.questionTitle }
-                    questionType={ q.q.questionType }
-                    questionText={ q.q.text }
-                    options={ q.q.option }
-                    onOptionClick={ this.handleOptionClick }
-                    shouldRender={ this.state.shouldRenderQuestion[i] }
-                    questionNumber={ i } />)) }
-              { this.state.QuestionSet.length > 0 ? (
-                <Card>
-                  <CardTitle>
-                    Done!
-                  </CardTitle>
-                  <CardActions>
-                    <IconButton>
-                      <Badge
-                        badgeContent={ this.state.numberOfCorrectAnswers }
-                        primary={ true }>
-                        <CorrectIcon/>
-                      </Badge>
-                    </IconButton>
-                    <IconButton>
-                      <Badge
-                        badgeContent={ this.state.numberOfWrongAnswers }
-                        secondary={ true }>
-                        <WrongIcon/>
-                      </Badge>
-                    </IconButton>
-                    <IconButton onTouchTap={ () => (window.location.reload()) }>
-                      <RefreshIcon/>
-                    </IconButton>
-                  </CardActions>
-                </Card>
-                ) : (
-                <Card>
-                  <CardTitle>
-                    Please wait
-                  </CardTitle>
-                </Card>
-                ) }
+              <List>
+                { this.state.QuestionSet.map((q, i) => (
+                    <ListItem disabled={ true }>
+                      <Question
+                        key={ JSON.stringify(q.q) }
+                        authorName={ this.props.teacher.name }
+                        authorIntro={ this.props.teacher.intro }
+                        authorAvatar={ this.props.teacher.avatar }
+                        questionTitle={ q.q.questionTitle }
+                        questionType={ q.q.questionType }
+                        questionText={ q.q.text }
+                        options={ q.q.option }
+                        onOptionClick={ this.handleOptionClick }
+                        questionNumber={ i }
+                        correctOption={ q.q.correctOption } />
+                    </ListItem>)) }
+                <ListItem disabled={ true }>
+                  { this.state.QuestionSet.length > 0 ? (
+                    <Card>
+                      <CardTitle>
+                        Done!
+                      </CardTitle>
+                      <CardActions>
+                        <IconButton>
+                          <Badge
+                            badgeContent={ this.state.numberOfCorrectAnswers }
+                            primary={ true }>
+                            <CorrectIcon/>
+                          </Badge>
+                        </IconButton>
+                        <IconButton>
+                          <Badge
+                            badgeContent={ this.state.numberOfWrongAnswers }
+                            secondary={ true }>
+                            <WrongIcon/>
+                          </Badge>
+                        </IconButton>
+                        <IconButton onTouchTap={ () => (window.location.reload()) }>
+                          <RefreshIcon/>
+                        </IconButton>
+                      </CardActions>
+                    </Card>
+                    ) : (
+                    <Card>
+                      <CardTitle>
+                        Please wait
+                        <LinearProgress/>
+                      </CardTitle>
+                    </Card>
+                    ) }
+                </ListItem>
+              </List>
               <Snackbar
                 open={ this.state.reflectionOpen }
-                message={ this.state.reflectionMessage }
+                message={ this.state.reflectionText }
                 autoHideDuration={ 4000 } />
             </div>);
   }
