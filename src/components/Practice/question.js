@@ -29,7 +29,7 @@ class Question extends Component {
         <CardHeader
           title={ this.props.authorName }
           subtitle={ this.props.authorIntro }
-          avatar={ this.props.authorAvatar } />
+          avatar={ this.props.authorAvatar ? this.props.authorAvatar : "img/default-teacher.png" } />
         <CardTitle
           title={ this.props.questionTitle }
           subtitle={ this.props.questionType } />
