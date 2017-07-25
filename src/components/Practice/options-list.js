@@ -22,9 +22,14 @@ class OptionsList extends Component {
       selectedOption: 0,
       selectedCorrect: false
     };
+    this.selected = false;
+    this.randArr = this.shuffleArr(this.props.options.map((v, i) => ({
+      value: v,
+      index: i
+    })));
   }
   shuffleArr(a) {
-    if (this.state.selected) {
+    if (this.selected) {
       return a;
     }
     for (let i = a.length; i; i--) {
@@ -36,6 +41,7 @@ class OptionsList extends Component {
 
   handleOptionClick(i: number) {
     if (!this.state.selected) {
+      this.selected = true;
       this.setState({
         selected: true,
         selectedOption: i,
@@ -46,11 +52,7 @@ class OptionsList extends Component {
   }
 
   render() {
-    const randArr = this.shuffleArr(this.props.options.map((v, i) => ({
-      value: v,
-      index: i
-    })));
-    const elements = randArr.map((v, i) => (this.state.selected && this.state.selectedOption === v.index) ?
+    const elements = this.randArr.map((v, i) => (this.state.selected && this.state.selectedOption === v.index) ?
       (<ListItem
          key={ JSON.stringify({
                  ...v,
