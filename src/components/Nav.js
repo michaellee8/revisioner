@@ -7,8 +7,8 @@ import { Switch } from 'react-router-dom'
 import { Route } from 'react-router-dom'
 import About from './About/about'
 import Practice from './Practice/practice'
-import Account from './account'
-import AccountButton from './account-button'
+import Account from './Account/account'
+import AccountButton from './Account/account-button'
 
 class Nav extends Component {
   constructor(props) {
