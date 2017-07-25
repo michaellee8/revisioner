@@ -11,7 +11,7 @@ class LoginInternal extends Component {
         <Card>
           <CardTitle
             title="Login"
-            subtitle="Please choose login method" />
+            subtitle="Please allow popup to show" />
           <CardText>
             <List>
               <ListItem
@@ -20,7 +20,7 @@ class LoginInternal extends Component {
                                firebase.auth().signInWithRedirect(new firebase.auth.FacebookAuthProvider()).then((result) => {
                                  this.props.onLogChange();
                                  alert("Login to Facebook Success: Redirecting");
-                                 this.props.history.push('/');
+                                 window.location.reload();
                                }).catch(function(error) {
                                  alert("Login to Facebook Fail: " + error);
                                })
@@ -31,7 +31,7 @@ class LoginInternal extends Component {
                                firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider()).then((result) => {
                                  this.props.onLogChange();
                                  alert("Login to Google Success: Redirecting");
-                                 this.props.history.push('/');
+                                 window.location.reload();
                                }).catch(function(error) {
                                  alert("Login to Google Fail: " + error);
                                })
