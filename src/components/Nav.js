@@ -7,6 +7,8 @@ import { Switch } from 'react-router-dom'
 import { Route } from 'react-router-dom'
 import About from './About/about'
 import Practice from './Practice/practice'
+import Account from './account'
+import AccountButton from './account-button'
 
 class Nav extends Component {
   constructor(props) {
@@ -27,7 +29,8 @@ class Nav extends Component {
       <div>
         <AppBar
           title="Revisioner"
-          onLeftIconButtonTouchTap={ this.handleToggle } />
+          onLeftIconButtonTouchTap={ this.handleToggle }
+          iconElementRight={ <AccountButton/> } />
         <Drawer
           docked={ false }
           open={ this.state.open }
@@ -60,6 +63,9 @@ class Nav extends Component {
           <Route
             path="/practice"
             component={ Practice } />
+          <Route
+            path="/account"
+            component={ Account } />
           <Route component={ Practice } />
         </Switch>
       </div>
