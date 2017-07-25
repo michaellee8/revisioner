@@ -4,17 +4,30 @@ import Login from './login'
 import firebase from 'firebase'
 
 class Account extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.handleLogChange = this.handleLogChange.bind(this);
   }
-  handleLogChange(){
+  handleLogChange() {
     this.forceUpdate();
   }
+
+  componentDidMount() {
+    this.firebaseAuthChecker = firebase.auth().onAuthStateChanged(() => {
+      this.forceUpdate()
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.firebaseAuthChecker) {
+      this.firebaseAuthChecker();
+    }
+  }
+
   render() {
     return firebase.auth().currentUser ? (
-      <Logout onLogChange={this.handleLogChange}/>) : (
-      <Login onLogChange={this.handleLogChange}/>);
+      <Logout onLogChange={ this.handleLogChange } />) : (
+      <Login onLogChange={ this.handleLogChange } />);
   }
 }
 

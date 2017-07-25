@@ -17,24 +17,30 @@ class LoginInternal extends Component {
               <ListItem
                 primaryText="Sign in with FACEBOOK"
                 onTouchTap={ () => {
-                               firebase.auth().signInWithRedirect(new firebase.auth.FacebookAuthProvider()).then((result) => {
+                               firebase.auth().signInWithRedirect(new firebase.auth.FacebookAuthProvider()).catch(function(error) {
+                                 alert("Login to Facebook Fail: " + error);
+                               });
+                               firebase.auth().getRedirectResult().then((result) => {
                                  this.props.onLogChange();
+                                 this.props.history.push('/');
                                  alert("Login to Facebook Success: Redirecting");
-                                 window.location.reload();
                                }).catch(function(error) {
                                  alert("Login to Facebook Fail: " + error);
-                               })
+                               });
                              } } />
               <ListItem
                 primaryText="Sign in with GOOGLE"
                 onTouchTap={ () => {
-                               firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider()).then((result) => {
+                               firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider()).catch(function(error) {
+                                 alert("Login to Google Fail: " + error);
+                               });
+                               firebase.auth().getRedirectResult().then((result) => {
                                  this.props.onLogChange();
+                                 this.props.history.push('/');
                                  alert("Login to Google Success: Redirecting");
-                                 window.location.reload();
                                }).catch(function(error) {
                                  alert("Login to Google Fail: " + error);
-                               })
+                               });
                              } } />
             </List>
           </CardText>
