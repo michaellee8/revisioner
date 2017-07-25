@@ -86,9 +86,10 @@ class QuestionList extends Component {
     return (<div>
               <List>
                 { this.state.QuestionSet.map((q, i) => (
-                    <ListItem disabled={ true }>
+                    <ListItem
+                      key={ JSON.stringify(q.q) }
+                      disabled={ true }>
                       <Question
-                        key={ JSON.stringify(q.q) }
                         authorName={ this.props.teacher.name }
                         authorIntro={ this.props.teacher.intro }
                         authorAvatar={ this.props.teacher.avatar }

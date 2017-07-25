@@ -66,6 +66,10 @@ class OptionsList extends Component {
                         this.handleOptionClick(v.index)
                       } } />) :
       (<ListItem
+         key={ JSON.stringify({
+                 ...v,
+                 s: this.state
+               }) }
          primaryText={ (<div>
                           <span>{ v.value }</span>
                         </div>) }
