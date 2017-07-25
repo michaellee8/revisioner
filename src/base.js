@@ -10,4 +10,3 @@ var app = firebase.initializeApp({
   });
 var base = Rebase.createClass(app.database());
 export default base;
-export {firebase as firebaseInstance};
