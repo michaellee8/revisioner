@@ -11,7 +11,7 @@ class LoginInternal extends Component {
         <Card>
           <CardTitle
             title="Login"
-            subtitle="Please allow popup to show" />
+            subtitle="YOU MUST NOT ATTEMPT TO SIGN IN WITH ACCOUNT REGISTERED BY SAME EMAIL ADDRESS" />
           <CardText>
             <List>
               <ListItem
@@ -23,7 +23,7 @@ class LoginInternal extends Component {
                                firebase.auth().getRedirectResult().then((result) => {
                                  this.props.onLogChange();
                                  this.props.history.push('/');
-                                 alert("Login to Facebook Success: Redirecting");
+                                 alert("Login to Facebook: Redirecting");
                                }).catch(function(error) {
                                  alert("Login to Facebook Fail: " + error);
                                });
@@ -37,7 +37,7 @@ class LoginInternal extends Component {
                                firebase.auth().getRedirectResult().then((result) => {
                                  this.props.onLogChange();
                                  this.props.history.push('/');
-                                 alert("Login to Google Success: Redirecting");
+                                 alert("Login to Google: Redirecting");
                                }).catch(function(error) {
                                  alert("Login to Google Fail: " + error);
                                });
