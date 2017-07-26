@@ -6,7 +6,7 @@ import Account from './Account/account'
 import { Switch } from 'react-router-dom'
 class GARoutes extends Component {
   logPageView() {
-    window.ga('send', 'pageview', window.location.pathname);console.log(window.location.pathname);
+    window.ga('send', 'pageview', window.location.pathname);
   }
   componentWillMount() {
     this.logPageView();
