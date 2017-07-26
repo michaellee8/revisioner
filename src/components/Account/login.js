@@ -17,7 +17,7 @@ class LoginInternal extends Component {
               <ListItem
                 primaryText="Sign in with FACEBOOK"
                 onTouchTap={ () => {
-                               firebase.auth().signInWithRedirect(new firebase.auth.FacebookAuthProvider()).catch(function(error) {
+                               firebase.auth().signInWithRedirect(new firebase.auth.FacebookAuthProvider().addScope('email')).catch(function(error) {
                                  alert("Login to Facebook Fail: " + error);
                                });
                                firebase.auth().getRedirectResult().then((result) => {
