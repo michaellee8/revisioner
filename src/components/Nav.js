@@ -3,11 +3,7 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import { Link } from 'react-router-dom'
-import { Switch } from 'react-router-dom'
-import { Route } from 'react-router-dom'
-import About from './About/about'
-import Practice from './Practice/practice'
-import Account from './Account/account'
+import GARoutes from './GARoutes'
 import AccountButton from './Account/account-button'
 
 class Nav extends Component {
@@ -56,18 +52,7 @@ class Nav extends Component {
             </MenuItem>
           </Link>
         </Drawer>
-        <Switch>
-          <Route
-            path="/about"
-            component={ About } />
-          <Route
-            path="/practice"
-            component={ Practice } />
-          <Route
-            path="/account"
-            component={ Account } />
-          <Route component={ Practice } />
-        </Switch>
+        <GARoutes/>
       </div>
       );
   }

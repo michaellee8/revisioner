@@ -9,7 +9,7 @@ class App extends Component {
   render() {
     return (
       <MuiThemeProvider>
-        <Router onUpdate={ () => (window.ga('send', 'pageview', window.location.pathname)) }>
+        <Router>
           <Route
             path="/"
             component={ Nav }></Route>
