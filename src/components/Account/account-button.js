@@ -21,11 +21,21 @@ class AccountButtonInternal extends Component {
   render() {
     const {history} = this.props;
 
-    return (<IconButton onTouchTap={ () => (history.push('/account')) }>
-              { firebase.auth().currentUser ? (
-                firebase.auth().currentUser.photoURL ? (<Avatar src={ firebase.auth().currentUser.photoURL } />) : (<LogonIcon/>)) : (
-                <LogoffIcon/>) }
-            </IconButton>);
+    if (firebase.auth().currentUser) {
+      if (firebase.auth().currentUser.photoURL) {
+        return (<IconButton onTouchTap={ () => (history.push('/account')) }>
+                  <Avatar src={ firebase.auth().currentUser.photoURL }></Avatar>
+                </IconButton>);
+      } else {
+        return (<IconButton onTouchTap={ () => (history.push('/account')) }>
+                  <LogonIcon/>
+                </IconButton>);
+      }
+    } else {
+      return (<IconButton onTouchTap={ () => (history.push('/account')) }>
+                <LogoffIcon/>
+              </IconButton>);
+    }
   }
 }
 
