@@ -13,7 +13,6 @@ import { List, ListItem } from 'material-ui/List'
 
 class QuestionList extends Component {
   state: {
-    QuestionSet: Array<any>,
     shouldRenderQuestion: Array<boolean>,
     reflectionOpen: boolean,
     reflectionText: string,
@@ -21,13 +20,11 @@ class QuestionList extends Component {
     numberOfWrongAnswers: number
   }
   props: {
-    firebaseEndPoint: string,
-    teacher: {name: string, intro: string, avatar: string}
+    QuestionSet: Array<any>
   }
   constructor(props) {
     super(props);
     this.state = {
-      QuestionSet: [],
       shouldRenderQuestion: [],
       reflectionOpen: false,
       reflectionText: "",
@@ -38,26 +35,10 @@ class QuestionList extends Component {
   }
 
   componentWillMount() {
-    this.getQuestionSet();
-  }
-  getQuestionSet() {
-    base.fetch(this.props.firebaseEndPoint, {
-      context: this,
-      asArray: true
-    }).then(data => {
-      var tmp = [];
-      for (var i = 0; i < data.length; i++) {
-        tmp[i] = true;
-      }
-      this.setState({
-        QuestionSet: data,
-        shouldRenderQuestion: tmp
-      });
-    }).catch(error => alert("Cannot fetch questions\n" + error));
   }
 
   handleOptionClick(index, questionNumber) {
-    if (this.state.QuestionSet[questionNumber].q.correctOption === index) {
+    if (this.props.QuestionSet[questionNumber].q.correctOption === index) {
       this.setState({
         reflectionOpen: true,
         reflectionText: "Correct!"
@@ -85,24 +66,24 @@ class QuestionList extends Component {
   render() {
     return (<div>
               <List>
-                { this.state.QuestionSet.map((q, i) => (
+                { this.props.QuestionSet.map((q, i) => (
                     <ListItem
-                      key={ JSON.stringify(q.q) }
+                      key={ JSON.stringify(q) }
                       disabled={ true }>
                       <Question
-                        authorName={ this.props.teacher.name }
-                        authorIntro={ this.props.teacher.intro }
-                        authorAvatar={ this.props.teacher.avatar }
-                        questionTitle={ q.q.questionTitle }
-                        questionType={ q.q.questionType }
-                        questionText={ q.q.text }
-                        options={ q.q.option }
+                        authorName={ q.authorName }
+                        authorIntro={ q.authorIntro }
+                        authorAvatar={ q.authorAvatar }
+                        questionTitle={ q.questionTitle }
+                        questionType={ q.questionType }
+                        questionText={ q.text }
+                        options={ q.option }
                         onOptionClick={ this.handleOptionClick }
                         questionNumber={ i }
-                        correctOption={ q.q.correctOption } />
+                        correctOption={ q.correctOption } />
                     </ListItem>)) }
                 <ListItem disabled={ true }>
-                  { this.state.QuestionSet.length > 0 ? (
+                  { this.prop.QuestionSet.length > 0 ? (
                     <Card>
                       <CardTitle>
                         Done!
