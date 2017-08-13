@@ -3,6 +3,7 @@ import { Route } from 'react-router-dom'
 import About from './About/about'
 import Practice from './Practice/practice'
 import Account from './Account/account'
+import Create from './Create/create'
 import { Switch } from 'react-router-dom'
 class GARoutes extends Component {
   logPageView() {
@@ -25,6 +26,9 @@ class GARoutes extends Component {
               <Route
                 path="/account"
                 component={ Account } />
+              <Route
+                path="/create"
+                component={ Create } />
               <Route component={ Practice } />
             </Switch>
       );

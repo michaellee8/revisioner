@@ -43,6 +43,15 @@ class Nav extends Component {
             </MenuItem>
           </Link>
           <Link
+            to="/create"
+            style={ {
+                      textDecoration: 'none'
+                    } }>
+            <MenuItem onTouchTap={ this.handleClose }>
+              Create
+            </MenuItem>
+          </Link>
+          <Link
             to="/about"
             style={ {
                       textDecoration: 'none'
