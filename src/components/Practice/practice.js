@@ -31,7 +31,8 @@ class Practice extends Component {
       this.getQuestions();
     }).then(res => {
       this.setState((prevState, props) => ({
-        QuestionSet: prevState.QuestionSet.concat(res.data)
+        QuestionSet: prevState.QuestionSet.concat(res.data),
+        fetchTimes: prevState.fetchTimes + 1
       })
       );
     });
