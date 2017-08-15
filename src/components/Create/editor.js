@@ -1,6 +1,8 @@
 import React, { Components } from "react";
 import CorrectIcon from "material-ui/svg-icons/action/done";
 import { Card, CardText, CardActions, CardTitle } from "material-ui/Card";
+import TextField from 'material-ui/TextField'
+import FlatButton from 'material-ui/FlatButton'
 
 class Editor extends React.Components {
   props: {

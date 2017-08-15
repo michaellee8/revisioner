@@ -1,15 +1,15 @@
-import base from '../../base.js';
-import Question from './question'
-import React, { Component } from 'react'
-import Snackbar from 'material-ui/Snackbar'
-import { Card, CardActions, CardTitle } from 'material-ui/Card'
-import CorrectIcon from 'material-ui/svg-icons/action/done'
-import WrongIcon from 'material-ui/svg-icons/content/clear'
-import RefreshIcon from 'material-ui/svg-icons/navigation/refresh'
-import IconButton from 'material-ui/IconButton'
-import Badge from 'material-ui/Badge'
-import LinearProgress from 'material-ui/LinearProgress'
-import { List, ListItem } from 'material-ui/List'
+import base from "../../base.js";
+import Question from "./question";
+import React, { Component } from "react";
+import Snackbar from "material-ui/Snackbar";
+import { Card, CardActions, CardTitle } from "material-ui/Card";
+import CorrectIcon from "material-ui/svg-icons/action/done";
+import WrongIcon from "material-ui/svg-icons/content/clear";
+import RefreshIcon from "material-ui/svg-icons/navigation/refresh";
+import IconButton from "material-ui/IconButton";
+import Badge from "material-ui/Badge";
+import LinearProgress from "material-ui/LinearProgress";
+import { List, ListItem } from "material-ui/List";
 
 class QuestionList extends Component {
   state: {
@@ -18,10 +18,10 @@ class QuestionList extends Component {
     reflectionText: string,
     numberOfCorrectAnswers: number,
     numberOfWrongAnswers: number
-  }
+  };
   props: {
     QuestionSet: Array<any>
-  }
+  };
   constructor(props) {
     super(props);
     this.state = {
@@ -34,8 +34,7 @@ class QuestionList extends Component {
     this.handleOptionClick = this.handleOptionClick.bind(this);
   }
 
-  componentWillMount() {
-  }
+  componentWillMount() {}
 
   handleOptionClick(index, questionNumber) {
     if (this.props.QuestionSet[questionNumber].q.correctOption === index) {
@@ -64,65 +63,66 @@ class QuestionList extends Component {
     });
   }
   render() {
-    return (<div>
-              <List>
-                { this.props.QuestionSet.map((q, i) => (
-                    <ListItem
-                      key={ JSON.stringify(q) }
-                      disabled={ true }>
-                      <Question
-                        authorName={ q.authorName }
-                        authorIntro={ q.authorIntro }
-                        authorAvatar={ q.authorAvatar }
-                        questionTitle={ q.questionTitle }
-                        questionType={ q.questionType }
-                        questionText={ q.text }
-                        options={ q.option }
-                        onOptionClick={ this.handleOptionClick }
-                        questionNumber={ i }
-                        correctOption={ q.correctOption } />
-                    </ListItem>)) }
-                <ListItem disabled={ true }>
-                  { this.prop.QuestionSet.length > 0 ? (
-                    <Card>
-                      <CardTitle>
-                        Done!
-                      </CardTitle>
-                      <CardActions>
-                        <IconButton>
-                          <Badge
-                            badgeContent={ this.state.numberOfCorrectAnswers }
-                            primary={ true }>
-                            <CorrectIcon/>
-                          </Badge>
-                        </IconButton>
-                        <IconButton>
-                          <Badge
-                            badgeContent={ this.state.numberOfWrongAnswers }
-                            secondary={ true }>
-                            <WrongIcon/>
-                          </Badge>
-                        </IconButton>
-                        <IconButton onTouchTap={ () => (window.location.reload()) }>
-                          <RefreshIcon/>
-                        </IconButton>
-                      </CardActions>
-                    </Card>
-                    ) : (
-                    <Card>
-                      <CardTitle>
-                        Please wait
-                        <LinearProgress/>
-                      </CardTitle>
-                    </Card>
-                    ) }
-                </ListItem>
-              </List>
-              <Snackbar
-                open={ this.state.reflectionOpen }
-                message={ this.state.reflectionText }
-                autoHideDuration={ 4000 } />
-            </div>);
+    return (
+      <div>
+        <List>
+          {this.props.QuestionSet.map((q, i) =>
+            <ListItem key={JSON.stringify(q)} disabled={true}>
+              <Question
+                authorName={q.author.authorName}
+                authorIntro={q.author.authorIntro}
+                authorAvatar={q.author.authorAvatar}
+                questionTitle={q.questionTitle}
+                questionType={q.questionType}
+                questionText={q.text}
+                options={q.option}
+                onOptionClick={this.handleOptionClick}
+                questionNumber={i}
+                correctOption={q.correctOption}
+              />
+            </ListItem>
+          )}
+          <ListItem disabled={true}>
+            {this.prop.QuestionSet.length > 0
+              ? <Card>
+                  <CardTitle>Done!</CardTitle>
+                  <CardActions>
+                    <IconButton>
+                      <Badge
+                        badgeContent={this.state.numberOfCorrectAnswers}
+                        primary={true}
+                      >
+                        <CorrectIcon />
+                      </Badge>
+                    </IconButton>
+                    <IconButton>
+                      <Badge
+                        badgeContent={this.state.numberOfWrongAnswers}
+                        secondary={true}
+                      >
+                        <WrongIcon />
+                      </Badge>
+                    </IconButton>
+                    <IconButton onTouchTap={() => window.location.reload()}>
+                      <RefreshIcon />
+                    </IconButton>
+                  </CardActions>
+                </Card>
+              : <Card>
+                  <CardTitle>
+                    Please wait
+                    <LinearProgress />
+                  </CardTitle>
+                </Card>}
+          </ListItem>
+        </List>
+        <Snackbar
+          open={this.state.reflectionOpen}
+          message={this.state.reflectionText}
+          autoHideDuration={4000}
+        />
+      </div>
+    );
   }
 }
 
