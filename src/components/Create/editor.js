@@ -1,15 +1,23 @@
-import React, { Components } from "react";
+import React, { Component } from "react";
 import CorrectIcon from "material-ui/svg-icons/action/done";
-import { Card, CardText, CardActions, CardTitle } from "material-ui/Card";
-import TextField from 'material-ui/TextField'
-import FlatButton from 'material-ui/FlatButton'
+import {
+  Card,
+  CardText,
+  CardActions,
+  CardTitle,
+  CardHeader
+} from "material-ui/Card";
+import List from "material-ui/List";
+import TextField from "material-ui/TextField";
+import FlatButton from "material-ui/FlatButton";
+import WrongIcon from "material-ui/svg-icons/content/clear";
 
-class Editor extends React.Components {
+class Editor extends Component {
   props: {
     SetTitle: string,
     SetSubtitle: string,
-    SetId: string
-    sunbitHandler: Function
+    SetId: string,
+    sumbitHandler: Function
   };
   state: {
     questionTitle: string,
@@ -20,9 +28,8 @@ class Editor extends React.Components {
     currentOption: string
   };
   constructor(props) {
-    this.state.correctOption = 0;
-    this.state.currentOption = "";
-    this.state.option = [];
+    super(props);
+    this.setState({ correctOption: 0, currentOption: "", option: [] });
   }
   sumbit() {
     return JSON.stringify({
@@ -38,7 +45,10 @@ class Editor extends React.Components {
     return (
       <div>
         <Card>
-          <CardHeader title={SetTitle} SetSubtitle={SetSubtitle} />
+          <CardHeader
+            title={this.props.SetTitle}
+            SetSubtitle={this.props.SetSubtitle}
+          />
           <CardText>
             <TextField
               hintText="Question Title"
@@ -88,14 +98,14 @@ class Editor extends React.Components {
             <br />
             <TextField
               hintText="New Option"
-              value={thi.state.currentOption}
+              value={this.state.currentOption}
               onChange={(e, v) =>
                 this.setState({
                   currentOption: v
                 })}
             />
           </CardText>
-          <CardAction>
+          <CardActions>
             <FlatButton
               label="Add Option"
               onTouchTap={e =>
@@ -108,7 +118,7 @@ class Editor extends React.Components {
               label="Sumbit"
               onTouchTap={this.props.sumbitHandler(this.sumbit())}
             />
-          </CardAction>
+          </CardActions>
         </Card>
       </div>
     );

@@ -1,16 +1,9 @@
-const Component = require("Component");
-const Menu = require("Menu.react");
-const MenuItem = require("MenuItem.react");
-const React = require("React");
-
-const axios = require("axios");
-const firebase = require("firebase");
-
 import React, { Component } from "react";
 import axios from "axios";
 import Menu from "material-ui/Menu";
 import MenuItem from "material-ui/MenuItem";
 import firebase from "firebase";
+import Editor from "./editor";
 
 class Create extends Component {
   state: {
@@ -23,7 +16,6 @@ class Create extends Component {
       .currentUser.getToken(true)
       .catch(err => {
         console.log(err);
-        this.getQuestionSet();
       })
       .then(authToken => {
         return axios({
@@ -38,7 +30,6 @@ class Create extends Component {
       })
       .catch(err => {
         console.log(err);
-        this.getQuestionSet();
       })
       .then(res => {
         this.setState({ questionSets: res.data });

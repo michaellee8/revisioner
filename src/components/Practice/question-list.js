@@ -83,7 +83,7 @@ class QuestionList extends Component {
             </ListItem>
           )}
           <ListItem disabled={true}>
-            {this.prop.QuestionSet.length > 0
+            {this.props.QuestionSet.length > 0
               ? <Card>
                   <CardTitle>Done!</CardTitle>
                   <CardActions>
