@@ -7,6 +7,7 @@ import TextField from "material-ui/TextField";
 import FlatButton from "material-ui/FlatButton";
 import Menu from "material-ui/Menu";
 import MenuItem from "material-ui/MenuItem";
+import { request } from "graphql-request";
 
 class LogoutInternal extends Component {
   state: {
@@ -27,23 +28,48 @@ class LogoutInternal extends Component {
         this.getQuestionSet();
       })
       .then(authToken => {
-        return axios({
-          url: "/createQuestionSet",
-          method: "post",
-          baseURL: window.serverUrl,
-          data: {
-            authId: firebase.auth().currentUser.uid,
-            authToken: authToken,
-            title: title,
-            subtitle: subtitle
+        return request(
+          "http://localhost:8080/graphql",
+          `
+          query getUserId {
+            users {
+              userId
+            }
           }
-        });
+        `
+        );
       })
+      .then(data =>
+        request(
+          "http://localhost:8080/graphql",
+          `
+        mutation newQuestionSet($input: createQuestionSetsInput!) {
+          createQuestionSets(input: $input){
+            clientMutationId
+          }
+        }
+      `,
+          {
+            input: {
+              values: [
+                {
+                  questionSetId: "",
+                  userId: 1,
+                  questionSetTitle: title,
+                  questionSetIntro: subtitle,
+                  questionSetCreateTimestamp: "",
+                  questionSetLastUpdateTimestamp: ""
+                }
+              ]
+            }
+          }
+        )
+      )
+      .then(res => this.getQuestionSet())
       .catch(err => {
         console.log(err);
         alert("Cannot create new question set");
-      })
-      .then(res => this.getQuestionSet());
+      });
   }
   getQuestionSet() {
     firebase
@@ -53,18 +79,40 @@ class LogoutInternal extends Component {
         console.log(err);
       })
       .then(authToken => {
-        return axios({
-          url: "/getQuestionSet",
-          method: "get",
-          baseURL: window.serverUrl,
-          params: {
-            authId: firebase.auth().currentUser.uid,
-            authToken: authToken
+        /*where: {userFirebaseAuthId: $baseId}
+$baseId: String
+        */
+        return request(
+          "http://localhost:8080/graphql",
+          `
+          query getUserId {
+  users(where: {}) {
+    userId
+    questionSets {
+      edges {
+        node {
+          questionSetId
+          questionSetTitle
+        }
+      }
+    }
+  }
+}
+
+        `,
+          {
+            baseId: firebase.auth().currentUser.uid
           }
-        });
+        );
       })
-      .then(res => {
-        this.setState({ questionSets: res.data });
+      .then(data => {
+        console.log(data);
+        this.setState({
+          questionSets: data.users[0].questionSets.edges.map(edge => ({
+            title: edge.node.questionSetTitle,
+            id: edge.node.questionSetId
+          }))
+        });
       })
       .catch(err => {
         console.log(err);
