@@ -4,8 +4,10 @@ import Menu from "material-ui/Menu";
 import MenuItem from "material-ui/MenuItem";
 import firebase from "firebase";
 import Editor from "./editor";
+import { request } from "graphql-request";
+import DropDownMenu from "material-ui/DropDownMenu";
 
-class Create extends Component {
+export default class Create extends Component {
   state: {
     questionSets: Array<any>,
     selectedQuestionSetValue: string
@@ -18,84 +20,66 @@ class Create extends Component {
         console.log(err);
       })
       .then(authToken => {
-        return axios({
-          url: "/getQuestionSet",
-          method: "get",
-          baseURL: window.serverUrl,
-          params: {
-            authId: firebase.auth().currentUser.uid,
-            authToken: authToken
+        /*where: {userFirebaseAuthId: $baseId}
+$baseId: String
+        */
+        return request(
+          window.serverUrl,
+          `
+          query getUserQuestionSet($w:SequelizeJSON) {
+            users(where:$w) {
+              userId
+              questionSets {
+                edges {
+                  node {
+                    questionSetId
+                    questionSetTitle
+                  }
+                }
+              }
+            }
           }
+
+          `,
+          {
+            w: {
+              userFirebaseAuthId: firebase.auth().currentUser.uid
+            }
+          }
+        );
+      })
+      .then(data => {
+        console.log(data);
+        this.setState({
+          questionSets: data.users[0].questionSets.edges.map(edge => ({
+            title: edge.node.questionSetTitle,
+            id: edge.node.questionSetId
+          }))
         });
       })
       .catch(err => {
         console.log(err);
-      })
-      .then(res => {
-        this.setState({ questionSets: res.data });
       });
+  }
+  componentWillMount() {
+    this.getQuestionSet();
   }
   render() {
     return (
       <div>
-        Select the question set
-        <Menu
-          onChange={(e, v) => {
-            this.setState((prevState, props) => {
-              var arr = JSON.parse(JSON.stringify(prevState.questionSets));
-              var i;
-              for (i = 0; i < arr.length; i++) {
-                if (arr[i].value === v) {
-                  arr[i].checked = true;
-                } else {
-                  arr[i].checked = false;
-                }
-              }
-              return {
-                questionSets: arr,
-                selectedQuestionSetValue: v
-              };
-            });
-          }}
+        {"Select the question set"}
+        <DropDownMenu
+          value={this.state ? this.state.selectedQuestionSetValue : null}
+          onChange={(event: object, key: number, value: any) =>
+            this.setState({ selectedQuestionSetValue: value })}
         >
-          {this.state.questionSets.map(v => {
-            return (
-              <MenuItem
-                primaryText={v.title}
-                value={v.id}
-                checked={v.checked ? true : false}
-              />
-            );
-          })}
-        </Menu>
-        <Editor
-          SetTitle={
-            this.state.questionSets.find(
-              element => element.value === this.state.selectedQuestionSetValue
-            ).title
-          }
-          SetTitle={
-            this.state.questionSets.find(
-              element => element.value === this.state.selectedQuestionSetValue
-            ).subtitle
-          }
-          SetId={
-            this.state.questionSets.find(
-              element => element.value === this.state.selectedQuestionSetValue
-            ).id
-          }
-          sumbitHandler={data => {
-            axios({
-              url: "/createQuestion",
-              method: "post",
-              baseURL: window.serverUrl,
-              data: data
-            }).catch(err => {
-              console.log(err);
-              alert("Cannot Sumbit Question");
-            });
-          }}
-        />
+          {this.state.questionSets.map(e =>
+            <MenuItem
+              value={e.questionSetId}
+              primaryText={e.questionSetTitle}
+            />
+          )}
+        </DropDownMenu>
       </div>
     );
   }

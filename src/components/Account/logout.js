@@ -19,6 +19,9 @@ class LogoutInternal extends Component {
     super(props);
     this.state = { questionSets: [], newSetTitle: "", newSetSubtitle: "" };
   }
+  componentWillMount() {
+    this.getQuestionSet();
+  }
   createQuestionSet(title: string, subtitle: string) {
     firebase
       .auth()
@@ -29,19 +32,24 @@ class LogoutInternal extends Component {
       })
       .then(authToken => {
         return request(
-          "http://localhost:8080/graphql",
+          window.serverUrl,
           `
-          query getUserId {
-            users {
+          query getUserId($w:SequelizeJSON) {
+            users (where:$w){
               userId
             }
           }
-        `
+        `,
+          {
+            w: {
+              userFirebaseAuthId: firebase.auth().currentUser.uid
+            }
+          }
         );
       })
       .then(data =>
         request(
-          "http://localhost:8080/graphql",
+          window.serverUrl,
           `
         mutation newQuestionSet($input: createQuestionSetsInput!) {
           createQuestionSets(input: $input){
@@ -51,16 +59,12 @@ class LogoutInternal extends Component {
       `,
           {
             input: {
-              values: [
-                {
-                  questionSetId: "",
-                  userId: 1,
-                  questionSetTitle: title,
-                  questionSetIntro: subtitle,
-                  questionSetCreateTimestamp: "",
-                  questionSetLastUpdateTimestamp: ""
-                }
-              ]
+              questionSetId: "",
+              userId: data.users[0].userId,
+              questionSetTitle: title,
+              questionSetIntro: subtitle,
+              questionSetCreateTimestamp: "",
+              questionSetLastUpdateTimestamp: ""
             }
           }
         )
@@ -83,25 +87,27 @@ class LogoutInternal extends Component {
 $baseId: String
         */
         return request(
-          "http://localhost:8080/graphql",
+          window.serverUrl,
           `
-          query getUserId {
-  users(where: {}) {
-    userId
-    questionSets {
-      edges {
-        node {
-          questionSetId
-          questionSetTitle
-        }
-      }
-    }
-  }
-}
+          query getUserQuestionSet($w:SequelizeJSON) {
+            users(where:$w) {
+              userId
+              questionSets {
+                edges {
+                  node {
+                    questionSetId
+                    questionSetTitle
+                  }
+                }
+              }
+            }
+          }
 
         `,
           {
-            baseId: firebase.auth().currentUser.uid
+            w: {
+              userFirebaseAuthId: firebase.auth().currentUser.uid
+            }
           }
         );
       })
@@ -173,6 +179,35 @@ $baseId: String
                 <MenuItem
                   primaryText={v.title}
                   value={v.id}
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Do you really want to delete question set " +
+                          v.title +
+                          " ?"
+                      )
+                    ) {
+                      request(
+                        window.serverUrl,
+                        `
+                        mutation removeqset($input:deleteQuestionSetsInput!){
+                          deleteQuestionSets(input:$input){
+                            affectedCount
+                          }
+                        }
+                        `,
+                        {
+                          input: {
+                            where: {
+                              userId: "1.5",
+                              questionSetId: v.id
+                            }
+                          }
+                        }
+                      );
+                      this.getQuestionSet();
+                    }
+                  }}
                   checked={v.checked ? true : false}
                 />
               );
@@ -180,10 +215,12 @@ $baseId: String
           </Menu>
           <TextField
             hintText="New Question Set Title"
+            value={this.state.newSetTitle}
             onChange={(e, v) => this.setState({ newSetTitle: v })}
           />
           <TextField
             hintText="New Question Set Subtitle"
+            value={this.state.newSetSubtitle}
             onChange={(e, v) => this.setState({ newSetSubtitle: v })}
           />
           <FlatButton

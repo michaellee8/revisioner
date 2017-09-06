@@ -6,7 +6,7 @@ import registerServiceWorker from "./registerServiceWorker";
 import * as injectTapEventPlugin from "react-tap-event-plugin";
 import "./base";
 
-window.serverUrl = "https://localhost:8443";
+window.serverUrl = "https://michaellee8-nuclide-server.appspot.com/graphql";
 injectTapEventPlugin();
 ReactDOM.render(<App />, document.getElementById("root"));
 registerServiceWorker();
