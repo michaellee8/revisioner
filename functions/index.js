@@ -15,8 +15,10 @@ exports.createNewUser = functions.auth.user().onCreate(event => {
     {
       input: {
         userFirebaseAuthId: event.data.uid,
-        userName: event.data.displayName,
-        userPhotoUrl: event.data.photoURL
+        userName: event.data.displayName
+          ? event.data.displayName
+          : "New Email User",
+        userPhotoUrl: event.data.photoURL ? event.data.photoURL : null
       }
     }
   ).catch(err => console.error(err));
