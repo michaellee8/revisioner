@@ -9,4 +9,4 @@ import "./base";
 window.serverUrl = "https://michaellee8-nuclide-server.appspot.com/graphql";
 injectTapEventPlugin();
 ReactDOM.render(<App />, document.getElementById("root"));
-registerServiceWorker();
+// registerServiceWorker();
