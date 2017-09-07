@@ -12,6 +12,10 @@ export default class Create extends Component {
     questionSets: Array<any>,
     selectedQuestionSetValue: string
   };
+  constructor(props) {
+    super(props);
+    this.state = { questionSets: [], selectedQuestionSetValue: "" };
+  }
   getQuestionSet() {
     firebase
       .auth()
@@ -49,7 +53,6 @@ $baseId: String
         );
       })
       .then(data => {
-        console.log(data);
         this.setState({
           questionSets: data.users[0].questionSets.edges.map(edge => ({
             title: edge.node.questionSetTitle,
@@ -69,16 +72,14 @@ $baseId: String
       <div>
         {"Select the question set"}
         <DropDownMenu
-          value={this.state ? this.state.selectedQuestionSetValue : null}
+          value={this.state.selectedQuestionSetValue}
           onChange={(event: object, key: number, value: any) =>
             this.setState({ selectedQuestionSetValue: value })}
         >
-          {this.state.questionSets.map(e =>
-            <MenuItem
-              value={e.questionSetId}
-              primaryText={e.questionSetTitle}
-            />
-          )}
+          {this.state.questionSets.map(e => {
+            console.log(e);
+            return <MenuItem value={e.id} primaryText={e.title} key={e.id} />;
+          })}
         </DropDownMenu>
       </div>
     );

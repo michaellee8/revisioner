@@ -17,7 +17,7 @@ class LogoutInternal extends Component {
   };
   constructor(props) {
     super(props);
-    this.state = { questionSets: [], newSetTitle: "", newSetSubtitle: "" };
+    this.setState = { questionSets: [], newSetTitle: "", newSetSubtitle: "" };
   }
   componentWillMount() {
     this.getQuestionSet();
@@ -97,6 +97,7 @@ $baseId: String
                   node {
                     questionSetId
                     questionSetTitle
+                    questionSetIntro
                   }
                 }
               }
@@ -112,11 +113,11 @@ $baseId: String
         );
       })
       .then(data => {
-        console.log(data);
         this.setState({
           questionSets: data.users[0].questionSets.edges.map(edge => ({
             title: edge.node.questionSetTitle,
-            id: edge.node.questionSetId
+            id: edge.node.questionSetId,
+            subtitle: edge.node.questionSetIntro
           }))
         });
       })
@@ -156,6 +157,7 @@ $baseId: String
         <div>QuestionSet you have created</div>
         <div>
           <Menu
+            disableAutoFocus={true}
             onChange={(e, v) => {
               this.setState((prevState, props) => {
                 var arr = JSON.parse(JSON.stringify(prevState.questionSets));
@@ -178,7 +180,9 @@ $baseId: String
               return (
                 <MenuItem
                   primaryText={v.title}
+                  // secondaryText={v.subtitle}
                   value={v.id}
+                  key={v.id}
                   onClick={() => {
                     if (
                       window.confirm(
@@ -216,12 +220,18 @@ $baseId: String
           <TextField
             hintText="New Question Set Title"
             value={this.state.newSetTitle}
-            onChange={(e, v) => this.setState({ newSetTitle: v })}
+            autoFocus={true}
+            onChange={(e, v) => {
+              this.setState({ newSetTitle: v });
+            }}
           />
           <TextField
-            hintText="New Question Set Subtitle"
+            hintText="New Question Set Intro"
             value={this.state.newSetSubtitle}
-            onChange={(e, v) => this.setState({ newSetSubtitle: v })}
+            autoFocus={true}
+            onChange={(e, v) => {
+              this.setState({ newSetSubtitle: v });
+            }}
           />
           <FlatButton
             label="Add Question Set"
