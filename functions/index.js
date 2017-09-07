@@ -18,7 +18,9 @@ exports.createNewUser = functions.auth.user().onCreate(event => {
         userName: event.data.displayName
           ? event.data.displayName
           : "New Email User",
-        userPhotoUrl: event.data.photoURL ? event.data.photoURL : null
+        userPhotoUrl: event.data.photoURL ? event.data.photoURL : null,
+        userCreateTimestamp: "",
+        userLastInteractionTimestamp: ""
       }
     }
   ).catch(err => console.error(err));
@@ -35,8 +37,10 @@ exports.removeOldUser = functions.auth.user().onDelete(event => {
     }
     `,
     {
-      where: {
-        userFirebaseAuthId: event.data.uid
+      input: {
+        where: {
+          userFirebaseAuthId: event.data.uid
+        }
       }
     }
   ).catch(err => console.error(err));

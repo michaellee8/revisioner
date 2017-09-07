@@ -17,7 +17,7 @@ class LogoutInternal extends Component {
   };
   constructor(props) {
     super(props);
-    this.setState = { questionSets: [], newSetTitle: "", newSetSubtitle: "" };
+    this.state = { questionSets: [], newSetTitle: "", newSetSubtitle: "" };
   }
   componentWillMount() {
     this.getQuestionSet();
