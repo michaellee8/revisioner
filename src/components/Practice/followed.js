@@ -4,7 +4,7 @@ import axios from "axios";
 import firebase from "firebase";
 import { request } from "graphql-request";
 
-class Practice extends Component {
+class Followed extends Component {
   state: {
     QuestionSet: Array<any>,
     fetchTimes: number
@@ -28,19 +28,58 @@ class Practice extends Component {
     }
   }
   getQuestions() {
-    if (true) {
-      request(
-        window.serverUrl,
-        `
-          {
-            questionsCount
+    firebase
+      .auth()
+      .currentUser.getToken(true)
+      .catch(err => {
+        console.log(err);
+        this.getQuestionSet();
+      })
+      .then(authToken => {
+        return request(
+          window.serverUrl,
+          `
+          query getUserId($w:SequelizeJSON) {
+            users (where:$w){
+              questionSetFollows{
+                edges{
+                  node{
+                    questionSetId
+                  }
+                }
+              }
+            }
           }
-        `
-      )
-        .then(data =>
-          request(
-            window.serverUrl,
-            `
+        `,
+          {
+            w: {
+              userFirebaseAuthId: firebase.auth().currentUser.uid
+            }
+          }
+        );
+      })
+      .then(data => {
+        request(
+          window.serverUrl,
+          `
+          query qCount($where: SequelizeJSON) {
+            questionsCount(where: $where)
+          }
+          `,
+          {
+            where: {
+              questionSetId: {
+                $in: data.users[0].questionSetFollows.edges.map(
+                  e => e.node.questionSetId
+                )
+              }
+            }
+          }
+        )
+          .then(d =>
+            request(
+              window.serverUrl,
+              `
             query getQuestion($offset: Int,$where: SequelizeJSON, $order: String, $limit: Int) {
               questions(offset:$offset,where: $where, order: $order, limit: $limit) {
                 questionId
@@ -92,28 +131,38 @@ class Practice extends Component {
               }
             }
             `,
-            {
-              where: {},
-              order: "questionCreateTimestamp",
-              limit: 5,
-              offset:
-                data.questionsCount - 5 * (this.state.fetchTimes + 1) > 0
-                  ? data.questionsCount - 5 * (this.state.fetchTimes + 1)
-                  : 0
-            }
+              {
+                where: {
+                  questionSetId: {
+                    $in: data.users[0].questionSetFollows.edges.map(
+                      e => e.node.questionSetId
+                    )
+                  }
+                },
+                order: "questionCreateTimestamp",
+                limit: 5,
+                offset:
+                  data.questionsCount - 5 * (this.state.fetchTimes + 1) > 0
+                    ? data.questionsCount - 5 * (this.state.fetchTimes + 1)
+                    : 0
+              }
+            )
           )
-        )
-        .then(data => {
-          console.log(data);
-          this.setState((prevState, props) => ({
-            QuestionSet: prevState.QuestionSet.concat(data.questions.reverse()),
-            fetchTimes: prevState.fetchTimes + 1
-          }));
-        })
-        .catch(err => {
-          console.log(err);
-          window.alert("Internal error happened, please try again later");
-        });
+          .then(data => {
+            console.log(data);
+            this.setState((prevState, props) => ({
+              QuestionSet: prevState.QuestionSet.concat(
+                data.questions.reverse()
+              ),
+              fetchTimes: prevState.fetchTimes + 1
+            }));
+          })
+          .catch(err => {
+            console.log(err);
+            window.alert("Internal error happened, please try again later");
+          });
+      });
+    if (true) {
     }
   }
   componentWillMount() {
@@ -123,7 +172,7 @@ class Practice extends Component {
     return (
       <QuestionList
         QuestionSet={this.state.QuestionSet}
-        isFollow={true}
+        isFollow={false}
         fetchQ={(fn: Function) => {
           this.getQuestions();
           fn();
@@ -133,4 +182,4 @@ class Practice extends Component {
   }
 }
 
-export default Practice;
+export default Followed;

@@ -17,6 +17,7 @@ import MenuItem from "material-ui/MenuItem";
 import Dialog from "material-ui/Dialog";
 import { IntlProvider, FormattedRelative } from "react-intl";
 import { List, ListItem } from "material-ui/List";
+import TextField from "material-ui/TextField";
 
 class Question extends Component {
   constructor(props) {
@@ -230,14 +231,7 @@ class Question extends Component {
                   })
                 : null}
           />
-          <FlatButton
-            label={this.props.commentsCount + " " + "Comments"}
-            onTouchTap={e =>
-              this.setState({
-                openComments: true,
-                anchorEl: e.currentTarget
-              })}
-          />
+
           <Popover
             open={this.state.openReactions}
             onRequestClose={() => this.setState({ openReactions: false })}
@@ -310,6 +304,111 @@ class Question extends Component {
               )}
             </Menu>
           </Popover>
+          <FlatButton
+            label={this.props.commentsCount + " " + "Comments"}
+            onTouchTap={e =>
+              this.setState({
+                openComments: true,
+                anchorEl: e.currentTarget
+              })}
+          />
+          <Dialog
+            title="Comments"
+            open={this.state.openComments}
+            onRequestClose={() => this.setState({ openComments: false })}
+            actions={[
+              firebase.auth().currentUser
+                ? <FlatButton
+                    label="COMMENT"
+                    onTouchTap={() => {
+                      this.setState({ openComments: false });
+                      firebase
+                        .auth()
+                        .currentUser.getToken(true)
+                        .catch(err => {
+                          console.log(err);
+                          this.getQuestionSet();
+                        })
+                        .then(authToken => {
+                          return request(
+                            window.serverUrl,
+                            `
+                      query getUserId($w:SequelizeJSON) {
+                        users (where:$w){
+                          userId
+                        }
+                      }
+                    `,
+                            {
+                              w: {
+                                userFirebaseAuthId: firebase.auth().currentUser
+                                  .uid
+                              }
+                            }
+                          );
+                        })
+                        .then(data =>
+                          request(
+                            window.serverUrl,
+                            `
+                          mutation newComment($input:createQuestionCommentsInput!){
+                            createQuestionComments(input:$input){
+                              affectedCount
+                            }
+                          }
+                          `,
+                            {
+                              input: {
+                                values: [
+                                  {
+                                    userId: data.users[0].userId,
+                                    questionId: this.props.qId,
+                                    questionCommentCreateTimestamp: "",
+                                    questionCommentLastUpdateTimestamp: "",
+                                    questionCommentContent: this.state
+                                      .newComment
+                                  }
+                                ]
+                              }
+                            }
+                          )
+                        )
+                        .catch(err => {
+                          console.log(err);
+                          window.alert(
+                            "Internal error, please try again later"
+                          );
+                        });
+                    }}
+                  />
+                : null,
+              <FlatButton
+                label="DONE"
+                onTouchTap={() => this.setState({ openComments: false })}
+              />
+            ]}
+          >
+            <List>
+              {this.props.comments.map(e =>
+                <ListItem key={e.questionCommentId} disabled={true}>
+                  <Card>
+                    <CardHeader
+                      title={e.user.userName}
+                      avatar={e.user.userPhotoUrl}
+                      subtitle={e.questionCommentText}
+                    />
+                  </Card>
+                </ListItem>
+              )}
+              {firebase.auth().currentUser
+                ? <TextField
+                    value={this.state.newComment}
+                    onChange={(e, v) => this.setState({ newComment: v })}
+                    hintText="Your new comment here"
+                  />
+                : null}
+            </List>
+          </Dialog>
           {firebase.auth().currentUser &&
           firebase.auth().currentUser.uid === this.props.authorFirebaseId
             ? <FlatButton

@@ -23,7 +23,8 @@ class QuestionList extends Component {
   };
   props: {
     QuestionSet: Array<any>,
-    fetchQ: Function
+    fetchQ: Function,
+    isFollow: boolean
   };
   constructor(props) {
     super(props);
@@ -95,15 +96,13 @@ class QuestionList extends Component {
                 onOptionClick={this.handleOptionClick}
                 questionNumber={i}
                 comments={q.questionComments.edges.map(o => ({
-                  questionAnswerId: o.node.questionCommentId,
-                  questionAnswerText: o.node.questionCommentContent,
-                  questionAnswerIsCorrect:
-                    o.node.questionCommentLastUpdateTimestamp,
+                  questionCommentId: o.node.questionCommentId,
+                  questionCommentText: o.node.questionCommentContent,
                   user: o.node.user
                 }))}
                 commentsCount={q.questionComments.total}
                 reactionsCount={q.questionReactions.total}
-                isFollow={true}
+                isFollow={this.props.isFollow}
               />
             </ListItem>
           )}

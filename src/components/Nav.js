@@ -66,7 +66,16 @@ class Nav extends Component {
                 <MenuItem onTouchTap={this.handleClose}>Create</MenuItem>
               </Link>
             : null}
-
+          {firebase.auth().currentUser
+            ? <Link
+                to="/followed"
+                style={{
+                  textDecoration: "none"
+                }}
+              >
+                <MenuItem onTouchTap={this.handleClose}>Followed</MenuItem>
+              </Link>
+            : null}
           <Link
             to="/about"
             style={{

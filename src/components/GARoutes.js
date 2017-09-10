@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Route } from "react-router-dom";
 import About from "./About/about";
 import Practice from "./Practice/practice";
+import Followed from "./Practice/followed";
 import Account from "./Account/account";
 import Create from "./Create/create";
 import { Switch } from "react-router-dom";
@@ -36,6 +37,9 @@ class GARoutes extends Component {
         <Route path="/account" component={Account} />
         {firebase.auth().currentUser
           ? <Route path="/create" component={Create} />
+          : null}
+        {firebase.auth().currentUser
+          ? <Route path="/followed" component={Followed} />
           : null}
         <Route component={Practice} />
       </Switch>
