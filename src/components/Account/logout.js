@@ -11,9 +11,7 @@ import { request } from "graphql-request";
 
 class LogoutInternal extends Component {
   state: {
-    questionSets: Array<any>,
-    newSetTitle: string,
-    newSetSubtitle: string
+    qSetId: String
   };
   constructor(props) {
     super(props);
@@ -51,20 +49,24 @@ class LogoutInternal extends Component {
         request(
           window.serverUrl,
           `
-        mutation newQuestionSet($input: createQuestionSetsInput!) {
-          createQuestionSets(input: $input){
-            clientMutationId
+          mutation newQuestionSet($input: createQuestionSetsInput!) {
+            createQuestionSets(input: $input){
+              clientMutationId
+            }
           }
-        }
-      `,
+          `,
           {
             input: {
-              questionSetId: "",
-              userId: data.users[0].userId,
-              questionSetTitle: title,
-              questionSetIntro: subtitle,
-              questionSetCreateTimestamp: "",
-              questionSetLastUpdateTimestamp: ""
+              values: [
+                {
+                  questionSetId: "",
+                  userId: data.users[0].userId,
+                  questionSetTitle: title,
+                  questionSetIntro: subtitle,
+                  questionSetCreateTimestamp: "",
+                  questionSetLastUpdateTimestamp: ""
+                }
+              ]
             }
           }
         )
@@ -72,8 +74,9 @@ class LogoutInternal extends Component {
       .then(res => this.getQuestionSet())
       .catch(err => {
         console.log(err);
-        alert("Cannot create new question set");
-      });
+        alert("Cannot create new question set due to an internal error");
+      })
+      .then(() => this.setState({ newSetTitle: "", newSetSubtitle: "" }));
   }
   getQuestionSet() {
     firebase
@@ -203,7 +206,6 @@ $baseId: String
                         {
                           input: {
                             where: {
-                              userId: "1.5",
                               questionSetId: v.id
                             }
                           }

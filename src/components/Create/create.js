@@ -81,6 +81,9 @@ $baseId: String
             return <MenuItem value={e.id} primaryText={e.title} key={e.id} />;
           })}
         </DropDownMenu>
+        {this.state.selectedQuestionSetValue
+          ? <Editor qSetId={this.state.selectedQuestionSetValue} />
+          : null}
       </div>
     );
   }

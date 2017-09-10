@@ -10,6 +10,7 @@ import IconButton from "material-ui/IconButton";
 import Badge from "material-ui/Badge";
 import LinearProgress from "material-ui/LinearProgress";
 import { List, ListItem } from "material-ui/List";
+const VisibilitySensor = require("react-visibility-sensor");
 
 class QuestionList extends Component {
   state: {
@@ -17,10 +18,12 @@ class QuestionList extends Component {
     reflectionOpen: boolean,
     reflectionText: string,
     numberOfCorrectAnswers: number,
-    numberOfWrongAnswers: number
+    numberOfWrongAnswers: number,
+    fetching: boolean
   };
   props: {
-    QuestionSet: Array<any>
+    QuestionSet: Array<any>,
+    fetchQ: Function
   };
   constructor(props) {
     super(props);
@@ -29,7 +32,8 @@ class QuestionList extends Component {
       reflectionOpen: false,
       reflectionText: "",
       numberOfCorrectAnswers: 0,
-      numberOfWrongAnswers: 0
+      numberOfWrongAnswers: 0,
+      fetching: false
     };
     this.handleOptionClick = this.handleOptionClick.bind(this);
   }
@@ -37,7 +41,10 @@ class QuestionList extends Component {
   componentWillMount() {}
 
   handleOptionClick(index, questionNumber) {
-    if (this.props.QuestionSet[questionNumber].q.correctOption === index) {
+    if (
+      this.props.QuestionSet[questionNumber].questionAnswers.edges[index].node
+        .questionAnswerIsCorrect
+    ) {
       this.setState({
         reflectionOpen: true,
         reflectionText: "Correct!"
@@ -67,50 +74,79 @@ class QuestionList extends Component {
       <div>
         <List>
           {this.props.QuestionSet.map((q, i) =>
-            <ListItem key={JSON.stringify(q)} disabled={true}>
+            <ListItem key={q.questionId} value={q.questionId} disabled={true}>
               <Question
-                authorName={q.author.authorName}
-                authorIntro={q.author.authorIntro}
-                authorAvatar={q.author.authorAvatar}
+                qId={q.questionId}
+                qSetId={q.questionSet.questionSetId}
+                authorName={q.questionSet.user.userName}
+                authorIntro={q.questionSet.user.userIntro}
+                authorAvatar={q.questionSet.user.userPhotoUrl}
+                authorFirebaseId={q.questionSet.user.userFirebaseAuthId}
                 questionTitle={q.questionTitle}
                 questionType={q.questionType}
-                questionText={q.text}
-                options={q.option}
+                questionText={q.questionContent}
+                lastUpdate={q.questionLastUpdateTimestamp}
+                options={q.questionAnswers.edges.map(o => ({
+                  questionAnswerId: o.node.questionAnswerId,
+                  questionAnswerText: o.node.questionAnswerText,
+                  questionAnswerIsCorrect: o.node.questionAnswerIsCorrect,
+                  questionSumbits: o.node.questionSumbits
+                }))}
                 onOptionClick={this.handleOptionClick}
                 questionNumber={i}
-                correctOption={q.correctOption}
+                comments={q.questionComments.edges.map(o => ({
+                  questionAnswerId: o.node.questionCommentId,
+                  questionAnswerText: o.node.questionCommentContent,
+                  questionAnswerIsCorrect:
+                    o.node.questionCommentLastUpdateTimestamp,
+                  user: o.node.user
+                }))}
+                commentsCount={q.questionComments.total}
+                reactionsCount={q.questionReactions.total}
+                isFollow={true}
               />
             </ListItem>
           )}
-          <ListItem disabled={true}>
+          <ListItem disabled={true} value={0}>
             {this.props.QuestionSet.length > 0
-              ? <Card>
-                  <CardTitle>Done!</CardTitle>
-                  <CardActions>
-                    <IconButton>
-                      <Badge
-                        badgeContent={this.state.numberOfCorrectAnswers}
-                        primary={true}
-                      >
-                        <CorrectIcon />
-                      </Badge>
-                    </IconButton>
-                    <IconButton>
-                      <Badge
-                        badgeContent={this.state.numberOfWrongAnswers}
-                        secondary={true}
-                      >
-                        <WrongIcon />
-                      </Badge>
-                    </IconButton>
-                    <IconButton onTouchTap={() => window.location.reload()}>
-                      <RefreshIcon />
-                    </IconButton>
-                  </CardActions>
-                </Card>
+              ? <VisibilitySensor
+                  onChange={(isVisible: boolean) => {
+                    if (isVisible && !this.state.fetching) {
+                      this.setState({ fetching: true });
+                      this.props.fetchQ(() =>
+                        this.setState({ fetching: false })
+                      );
+                    }
+                  }}
+                >
+                  <Card>
+                    <CardTitle>Done!</CardTitle>
+                    <CardActions>
+                      <IconButton>
+                        <Badge
+                          badgeContent={this.state.numberOfCorrectAnswers}
+                          primary={true}
+                        >
+                          <CorrectIcon />
+                        </Badge>
+                      </IconButton>
+                      <IconButton>
+                        <Badge
+                          badgeContent={this.state.numberOfWrongAnswers}
+                          secondary={true}
+                        >
+                          <WrongIcon />
+                        </Badge>
+                      </IconButton>
+                      <IconButton onTouchTap={() => window.location.reload()}>
+                        <RefreshIcon />
+                      </IconButton>
+                    </CardActions>
+                  </Card>
+                </VisibilitySensor>
               : <Card>
                   <CardTitle>
-                    Please wait
+                    Please login by clicking the top right corner icon
                     <LinearProgress />
                   </CardTitle>
                 </Card>}

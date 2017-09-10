@@ -1,24 +1,65 @@
 import React, { Component } from "react";
-import { Card, CardHeader, CardTitle, CardText } from "material-ui/Card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardText,
+  CardActions
+} from "material-ui/Card";
 import OptionsList from "./options-list";
 import Paper from "material-ui/Paper";
+import FlatButton from "material-ui/FlatButton";
+import Popover from "material-ui/Popover";
+import { request } from "graphql-request";
+import firebase from "firebase";
+import Menu from "material-ui/Menu";
+import MenuItem from "material-ui/MenuItem";
+import Dialog from "material-ui/Dialog";
+import { IntlProvider, FormattedRelative } from "react-intl";
+import { List, ListItem } from "material-ui/List";
 
 class Question extends Component {
   constructor(props) {
     super(props);
     this.handleOptionClick = this.handleOptionClick.bind(this);
+    this.state = {
+      openComments: false,
+      openReactions: false,
+      anchorEl: null,
+      showManage: false,
+      showComments: false
+    };
   }
   props: {
+    lastUpdate: string,
     authorName: string,
     authorIntro: string,
     authorAvatar: string,
+    authorFirebaseId: string,
     questionTitle: string,
     questionType: string,
     questionText: string,
-    options: Array<string>,
+    options: Array<{
+      questionAnswerText: string,
+      questionAnswerIsCorrect: boolean,
+      questionAnswerId: number,
+      questionSumbits: { total: number }
+    }>,
     onOptionClick: Function,
     questionNumber: number,
-    correctOption: number
+    comments: Array<any>,
+    commentsCount: number,
+    reactionsCount: number,
+    qId: number,
+    qSetId: number,
+    isFollow: boolean
+  };
+  state: {
+    openComments: boolean,
+    openReactions: boolean,
+    showManage: boolean,
+    showComments: boolean,
+    anchorEl: any
   };
   handleOptionClick(index: number, qNumber: number) {
     this.props.onOptionClick(index, this.props.questionNumber);
@@ -66,9 +107,244 @@ class Question extends Component {
           <OptionsList
             options={this.props.options}
             onOptionClick={this.handleOptionClick}
-            correctOption={this.props.correctOption}
           />
+          <IntlProvider locale="en">
+            <FormattedRelative value={this.props.lastUpdate} />
+          </IntlProvider>
         </CardText>
+        <CardActions>
+          <FlatButton
+            label={this.props.isFollow ? "FOLLOW" : "UNFOLLOW"}
+            onTouchTap={() =>
+              firebase
+                .auth()
+                .currentUser.getToken(true)
+                .catch(err => {
+                  console.log(err);
+                  this.getQuestionSet();
+                })
+                .then(authToken =>
+                  request(
+                    window.serverUrl,
+                    `
+                query getUserId($w:SequelizeJSON) {
+                  users (where:$w){
+                    userId
+                  }
+                }
+              `,
+                    {
+                      w: {
+                        userFirebaseAuthId: firebase.auth().currentUser.uid
+                      }
+                    }
+                  )
+                )
+                .then(
+                  data =>
+                    this.props.isFollow
+                      ? request(
+                          window.serverUrl,
+                          `
+                          mutation newFollow($input:createQuestionSetFollowsInput!){
+                            createQuestionSetFollows(input:$input){
+                              affectedCount
+                            }
+                          }
+                          `,
+                          {
+                            input: {
+                              values: [
+                                {
+                                  userId: data.users[0].userId,
+                                  questionSetFollowTimestamp: "",
+                                  questionSetId: this.props.qSetId
+                                }
+                              ]
+                            }
+                          }
+                        )
+                      : request(
+                          window.serverUrl,
+                          `
+                          mutation cancelFollow($input:deleteQuestionSetFollowsInput!){
+                            deleteQuestionSetFollows(input:$input){
+                              affectedCount
+                            }
+                          }
+                          `,
+                          {
+                            input: {
+                              where: {
+                                questionSetId: this.props.qSetId,
+                                userId: data.users[0].userId
+                              }
+                            }
+                          }
+                        )
+                )
+                .then(() =>
+                  window.alert(
+                    (this.props.isFollow ? "Follow" : "Unfollow") +
+                      " successful"
+                  )
+                )
+                .catch(err => {
+                  console.log(err);
+                  window.alert("Internal error, please try again later");
+                })}
+          />
+          <FlatButton
+            label={this.props.reactionsCount + " " + "Reactions"}
+            onTouchTap={e =>
+              this.setState({
+                openReactions: true,
+                anchorEl: e.currentTarget
+              })}
+          />
+          <Popover
+            open={this.state.openReactions}
+            onRequestClose={() => this.setState({ openReactions: false })}
+            anchorEl={this.state.anchorEl}
+          >
+            <Menu>
+              {["DISLIKE", "EASY", "HARD", "LIKE", "NOSEE", "REPORT"].map(v =>
+                <MenuItem
+                  primaryText={v}
+                  onTouchTap={() => {
+                    this.setState({ openReactions: false });
+                    firebase
+                      .auth()
+                      .currentUser.getToken(true)
+                      .catch(err => {
+                        console.log(err);
+                        this.getQuestionSet();
+                      })
+                      .then(authToken => {
+                        return request(
+                          window.serverUrl,
+                          `
+                          query getUserId($w:SequelizeJSON) {
+                            users (where:$w){
+                              userId
+                            }
+                          }
+                        `,
+                          {
+                            w: {
+                              userFirebaseAuthId: firebase.auth().currentUser
+                                .uid
+                            }
+                          }
+                        );
+                      })
+                      .then(data =>
+                        request(
+                          window.serverUrl,
+                          `
+                          mutation newReaction($input:createQuestionReactionsInput!){
+                            createQuestionReactions(input:$input){
+                              clientMutationId
+                            }
+                          }
+                          `,
+                          {
+                            input: {
+                              values: [
+                                {
+                                  questionReactionType: v,
+                                  userId: data.users[0].userId,
+                                  questionReactionTimestamp: "",
+                                  questionId: this.props.qId
+                                }
+                              ]
+                            }
+                          }
+                        )
+                      )
+                      .catch(err => {
+                        console.log(err);
+                        window.alert("Internal error, please try again later");
+                      });
+                  }}
+                />
+              )}
+            </Menu>
+          </Popover>
+          {firebase.auth().currentUser.uid === this.props.authorFirebaseId
+            ? <FlatButton
+                label="MANAGE"
+                onTouchTap={() => this.setState({ showManage: true })}
+              />
+            : null}
+          {firebase.auth().currentUser.uid === this.props.authorFirebaseId
+            ? <Dialog
+                title={
+                  "Manage page of question " +
+                  (this.props.questionTitle
+                    ? this.props.questionTitle
+                    : this.props.qId)
+                }
+                open={this.state.showManage}
+                onRequestClose={() => this.setState({ showManage: false })}
+                actions={[
+                  <FlatButton
+                    label="DELETE"
+                    onTouchTap={() => {
+                      window.confirm(
+                        "Do you really want to delete this question?"
+                      )
+                        ? request(
+                            window.serverUrl,
+                            `
+                            mutation cancelQuestion($input:deleteQuestionsInput!){
+                              deleteQuestions(input:$input){
+                                affectedCount
+                              }
+                            }
+                            `,
+                            {
+                              input: {
+                                where: {
+                                  questionId: this.props.qId
+                                }
+                              }
+                            }
+                          )
+                            .then(() => window.alert("Question deleted"))
+                            .catch(err => {
+                              window.alert(
+                                "Internal error, please try again later"
+                              );
+                              console.log(err);
+                            })
+                        : null;
+                    }}
+                  />,
+                  <FlatButton
+                    label="DONE"
+                    onTouchTap={() => this.setState({ showManage: false })}
+                  />
+                ]}
+              >
+                <List>
+                  {this.props.options.map(
+                    (e: {
+                      questionAnswerText: string,
+                      questionAnswerIsCorrect: boolean,
+                      questionAnswerId: number,
+                      questionSumbits: { total: number }
+                    }) =>
+                      <ListItem
+                        primaryText={e.questionAnswerText}
+                        secondaryText={e.questionSumbits.total.toString()}
+                        disabled={true}
+                      />
+                  )}
+                </List>
+              </Dialog>
+            : null}
+        </CardActions>
       </Card>
     );
   }

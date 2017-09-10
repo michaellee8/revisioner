@@ -1,19 +1,22 @@
-import { List, ListItem } from 'material-ui/List'
-import React, { Component } from 'react'
-import CorrectIcon from 'material-ui/svg-icons/action/done'
-import WrongIcon from 'material-ui/svg-icons/content/clear'
+import { List, ListItem } from "material-ui/List";
+import React, { Component } from "react";
+import CorrectIcon from "material-ui/svg-icons/action/done";
+import WrongIcon from "material-ui/svg-icons/content/clear";
 
 class OptionsList extends Component {
   props: {
-    options: Array<String>,
-    onOptionClick: Function,
-    correctOption: number
-  }
-  states: {
+    options: Array<{
+      questionAnswerText: string,
+      questionAnswerIsCorrect: boolean,
+      questionAnswerId: number
+    }>,
+    onOptionClick: Function
+  };
+  state: {
     selected: boolean,
     selectedOption: number,
     selectedCorrect: boolean
-  }
+  };
   constructor(props) {
     super(props);
     this.handleOptionClick = this.handleOptionClick.bind(this);
@@ -23,10 +26,13 @@ class OptionsList extends Component {
       selectedCorrect: false
     };
     this.selected = false;
-    this.randArr = this.shuffleArr(this.props.options.map((v, i) => ({
-      value: v,
-      index: i
-    })));
+    this.randArr = this.shuffleArr(
+      this.props.options.map((v, i) => ({
+        value: v,
+        index: i
+      }))
+    );
+    console.log(this.randArr);
   }
   shuffleArr(a) {
     if (this.selected) {
@@ -52,36 +58,50 @@ class OptionsList extends Component {
   }
 
   render() {
-    const elements = this.randArr.map((v, i) => (this.state.selected && this.state.selectedOption === v.index) ?
-      (<ListItem
-         key={ JSON.stringify({
-                 ...v,
-                 s: this.state
-               }) }
-         primaryText={ (<div>
-                          { this.state.selectedCorrect ? (<CorrectIcon/>) : (<WrongIcon/>) }
-                          <span>{ v.value }</span>
-                        </div>) }
-         onTouchTap={ () => {
-                        this.handleOptionClick(v.index)
-                      } } />) :
-      (<ListItem
-         key={ JSON.stringify({
-                 ...v,
-                 s: this.state
-               }) }
-         primaryText={ (<div>
-                          <span>{ v.value }</span>
-                        </div>) }
-         onTouchTap={ () => {
-                        this.handleOptionClick(v.index)
-                      } } />)
+    const elements = this.randArr.map(
+      (v, i) =>
+        this.state.selected && this.state.selectedOption === v.index
+          ? <ListItem
+              key={JSON.stringify({
+                ...v,
+                s: this.state
+              })}
+              primaryText={
+                <div>
+                  {v.value.questionAnswerIsCorrect
+                    ? <CorrectIcon />
+                    : <WrongIcon />}
+                  <span>
+                    {v.value.questionAnswerText}
+                  </span>
+                </div>
+              }
+              onTouchTap={() => {
+                this.handleOptionClick(v.index);
+              }}
+            />
+          : <ListItem
+              key={JSON.stringify({
+                ...v,
+                s: this.state
+              })}
+              primaryText={
+                <div>
+                  <span>
+                    {v.value.questionAnswerText}
+                  </span>
+                </div>
+              }
+              onTouchTap={() => {
+                this.handleOptionClick(v.index);
+              }}
+            />
     );
     return (
       <List>
-        { elements }
+        {elements}
       </List>
-      );
+    );
   }
 }
 
