@@ -31,6 +31,15 @@ class Nav extends Component {
           onLeftIconButtonTouchTap={this.handleToggle}
           iconElementRight={<AccountButton />}
         />
+        <span>
+          {
+            "Tip: you may need to manually refresh by pulling down the page or press F5 to see the changes"
+          }
+          <br />
+          {
+            "Tip x2: Please login to use all features by clicking icon at top-right corner"
+          }
+        </span>
         <Drawer
           docked={false}
           open={this.state.open}

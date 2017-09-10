@@ -28,24 +28,15 @@ class Practice extends Component {
     }
   }
   getQuestions() {
-    if (firebase.auth().currentUser) {
-      firebase
-        .auth()
-        .currentUser.getToken(true)
-        .catch(err => {
-          console.log(err);
-          this.getQuestions();
-        })
-        .then(authToken => {
-          return request(
-            window.serverUrl,
-            `
-            {
-              questionsCount
-            }
-          `
-          );
-        })
+    if (true) {
+      request(
+        window.serverUrl,
+        `
+          {
+            questionsCount
+          }
+        `
+      )
         .then(data =>
           request(
             window.serverUrl,
@@ -104,10 +95,10 @@ class Practice extends Component {
             {
               where: {},
               order: "questionCreateTimestamp",
-              limit: 2,
+              limit: 5,
               offset:
-                data.questionsCount - 2 * (this.state.fetchTimes + 1) > 0
-                  ? data.questionsCount - 2 * (this.state.fetchTimes + 1)
+                data.questionsCount - 5 * (this.state.fetchTimes + 1) > 0
+                  ? data.questionsCount - 5 * (this.state.fetchTimes + 1)
                   : 0
             }
           )

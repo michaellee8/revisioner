@@ -2,6 +2,8 @@ import { List, ListItem } from "material-ui/List";
 import React, { Component } from "react";
 import CorrectIcon from "material-ui/svg-icons/action/done";
 import WrongIcon from "material-ui/svg-icons/content/clear";
+import { request } from "graphql-request";
+import firebase from "firebase";
 
 class OptionsList extends Component {
   props: {
@@ -45,7 +47,7 @@ class OptionsList extends Component {
     return a;
   }
 
-  handleOptionClick(i: number) {
+  handleOptionClick(i: number, id: number) {
     if (!this.state.selected) {
       this.selected = true;
       this.setState({
@@ -53,6 +55,54 @@ class OptionsList extends Component {
         selectedOption: i,
         selectedCorrect: i === this.props.correctOption
       });
+      console.log(i, id);
+      firebase
+        .auth()
+        .currentUser.getToken(true)
+        .catch(err => {
+          console.log(err);
+          this.getQuestionSet();
+        })
+        .then(authToken => {
+          return request(
+            window.serverUrl,
+            `
+            query getUserId($w:SequelizeJSON) {
+              users (where:$w){
+                userId
+              }
+            }
+          `,
+            {
+              w: {
+                userFirebaseAuthId: firebase.auth().currentUser.uid
+              }
+            }
+          );
+        })
+        .then(data =>
+          request(
+            window.serverUrl,
+            `
+          mutation newQuestionSumbit($input: createQuestionSumbitsInput!) {
+            createQuestionSumbits(input: $input) {
+              affectedCount
+            }
+          }
+          `,
+            {
+              input: {
+                values: [
+                  {
+                    userId: data.users[0].userId,
+                    questionAnswerId: id,
+                    questionSumbitTimestamp: ""
+                  }
+                ]
+              }
+            }
+          )
+        );
       this.props.onOptionClick(i);
     }
   }
@@ -77,7 +127,7 @@ class OptionsList extends Component {
                 </div>
               }
               onTouchTap={() => {
-                this.handleOptionClick(v.index);
+                this.handleOptionClick(v.index, v.value.questionAnswerId);
               }}
             />
           : <ListItem
@@ -93,7 +143,7 @@ class OptionsList extends Component {
                 </div>
               }
               onTouchTap={() => {
-                this.handleOptionClick(v.index);
+                this.handleOptionClick(v.index, v.value.questionAnswerId);
               }}
             />
     );

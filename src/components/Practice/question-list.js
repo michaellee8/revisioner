@@ -118,6 +118,7 @@ class QuestionList extends Component {
                       );
                     }
                   }}
+                  partialVisibility={true}
                 >
                   <Card>
                     <CardTitle>Done!</CardTitle>

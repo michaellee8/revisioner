@@ -14,13 +14,17 @@ exports.createNewUser = functions.auth.user().onCreate(event => {
     `,
     {
       input: {
-        userFirebaseAuthId: event.data.uid,
-        userName: event.data.displayName
-          ? event.data.displayName
-          : "New Email User",
-        userPhotoUrl: event.data.photoURL ? event.data.photoURL : null,
-        userCreateTimestamp: "",
-        userLastInteractionTimestamp: ""
+        values: [
+          {
+            userFirebaseAuthId: event.data.uid,
+            userName: event.data.displayName
+              ? event.data.displayName
+              : "New Email User",
+            userPhotoUrl: event.data.photoURL ? event.data.photoURL : null,
+            userCreateTimestamp: "",
+            userLastInteractionTimestamp: ""
+          }
+        ]
       }
     }
   ).catch(err => console.error(err));

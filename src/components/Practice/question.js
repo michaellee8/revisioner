@@ -27,7 +27,9 @@ class Question extends Component {
       openReactions: false,
       anchorEl: null,
       showManage: false,
-      showComments: false
+      showComments: false,
+      newComment: "",
+      disableReactions: false
     };
   }
   props: {
@@ -59,7 +61,9 @@ class Question extends Component {
     openReactions: boolean,
     showManage: boolean,
     showComments: boolean,
-    anchorEl: any
+    anchorEl: any,
+    newComment: string,
+    disableReactions: boolean
   };
   handleOptionClick(index: number, qNumber: number) {
     this.props.onOptionClick(index, this.props.questionNumber);
@@ -113,92 +117,124 @@ class Question extends Component {
           </IntlProvider>
         </CardText>
         <CardActions>
-          <FlatButton
-            label={this.props.isFollow ? "FOLLOW" : "UNFOLLOW"}
-            onTouchTap={() =>
-              firebase
-                .auth()
-                .currentUser.getToken(true)
-                .catch(err => {
-                  console.log(err);
-                  this.getQuestionSet();
-                })
-                .then(authToken =>
-                  request(
-                    window.serverUrl,
-                    `
+          {firebase.auth().currentUser
+            ? <FlatButton
+                label={this.props.isFollow ? "FOLLOW" : "UNFOLLOW"}
+                onTouchTap={() =>
+                  firebase
+                    .auth()
+                    .currentUser.getToken(true)
+                    .catch(err => {
+                      console.log(err);
+                      this.getQuestionSet();
+                    })
+                    .then(authToken =>
+                      request(
+                        window.serverUrl,
+                        `
                 query getUserId($w:SequelizeJSON) {
                   users (where:$w){
                     userId
                   }
                 }
               `,
-                    {
-                      w: {
-                        userFirebaseAuthId: firebase.auth().currentUser.uid
-                      }
-                    }
-                  )
-                )
-                .then(
-                  data =>
-                    this.props.isFollow
-                      ? request(
-                          window.serverUrl,
-                          `
-                          mutation newFollow($input:createQuestionSetFollowsInput!){
-                            createQuestionSetFollows(input:$input){
-                              affectedCount
-                            }
+                        {
+                          w: {
+                            userFirebaseAuthId: firebase.auth().currentUser.uid
                           }
-                          `,
-                          {
-                            input: {
-                              values: [
-                                {
-                                  userId: data.users[0].userId,
-                                  questionSetFollowTimestamp: "",
-                                  questionSetId: this.props.qSetId
-                                }
-                              ]
-                            }
-                          }
-                        )
-                      : request(
-                          window.serverUrl,
-                          `
+                        }
+                      )
+                    )
+                    .then(
+                      data =>
+                        this.props.isFollow
+                          ? request(
+                              window.serverUrl,
+                              `
                           mutation cancelFollow($input:deleteQuestionSetFollowsInput!){
                             deleteQuestionSetFollows(input:$input){
                               affectedCount
                             }
                           }
                           `,
-                          {
-                            input: {
-                              where: {
-                                questionSetId: this.props.qSetId,
-                                userId: data.users[0].userId
+                              {
+                                input: {
+                                  where: {
+                                    questionSetId: this.props.qSetId,
+                                    userId: data.users[0].userId
+                                  }
+                                }
                               }
+                            ).then(() =>
+                              request(
+                                window.serverUrl,
+                                `
+                          mutation newFollow($input:createQuestionSetFollowsInput!){
+                            createQuestionSetFollows(input:$input){
+                              affectedCount
                             }
                           }
-                        )
-                )
-                .then(() =>
-                  window.alert(
-                    (this.props.isFollow ? "Follow" : "Unfollow") +
-                      " successful"
-                  )
-                )
-                .catch(err => {
-                  console.log(err);
-                  window.alert("Internal error, please try again later");
-                })}
-          />
+                          `,
+                                {
+                                  input: {
+                                    values: [
+                                      {
+                                        userId: data.users[0].userId,
+                                        questionSetFollowTimestamp: "",
+                                        questionSetId: this.props.qSetId
+                                      }
+                                    ]
+                                  }
+                                }
+                              )
+                            )
+                          : request(
+                              window.serverUrl,
+                              `
+                          mutation cancelFollow($input:deleteQuestionSetFollowsInput!){
+                            deleteQuestionSetFollows(input:$input){
+                              affectedCount
+                            }
+                          }
+                          `,
+                              {
+                                input: {
+                                  where: {
+                                    questionSetId: this.props.qSetId,
+                                    userId: data.users[0].userId
+                                  }
+                                }
+                              }
+                            )
+                    )
+                    .then(() =>
+                      window.alert(
+                        (this.props.isFollow ? "Follow" : "Unfollow") +
+                          " successful"
+                      )
+                    )
+                    .catch(err => {
+                      console.log(err);
+                      window.alert("Internal error, please try again later");
+                    })}
+              />
+            : null}
           <FlatButton
             label={this.props.reactionsCount + " " + "Reactions"}
+            disabled={this.state.disableReactions}
+            onTouchTap={e =>
+              firebase.auth().currentUser
+                ? this.setState({
+                    openReactions: true,
+                    anchorEl: e.currentTarget
+                  })
+                : null}
+          />
+          <FlatButton
+            label={this.props.commentsCount + " " + "Comments"}
             onTouchTap={e =>
               this.setState({
-                openReactions: true,
+                openComments: true,
                 anchorEl: e.currentTarget
               })}
           />
@@ -212,7 +248,10 @@ class Question extends Component {
                 <MenuItem
                   primaryText={v}
                   onTouchTap={() => {
-                    this.setState({ openReactions: false });
+                    this.setState({
+                      openReactions: false,
+                      disableReactions: true
+                    });
                     firebase
                       .auth()
                       .currentUser.getToken(true)
@@ -271,13 +310,15 @@ class Question extends Component {
               )}
             </Menu>
           </Popover>
-          {firebase.auth().currentUser.uid === this.props.authorFirebaseId
+          {firebase.auth().currentUser &&
+          firebase.auth().currentUser.uid === this.props.authorFirebaseId
             ? <FlatButton
                 label="MANAGE"
                 onTouchTap={() => this.setState({ showManage: true })}
               />
             : null}
-          {firebase.auth().currentUser.uid === this.props.authorFirebaseId
+          {firebase.auth().currentUser &&
+          firebase.auth().currentUser.uid === this.props.authorFirebaseId
             ? <Dialog
                 title={
                   "Manage page of question " +

@@ -236,17 +236,20 @@ $baseId: String
                             `,
                               {
                                 input: {
-                                  values: [
-                                    {
-                                      questionId:
-                                        data.createQuestions.nodes[0]
-                                          .newQuestions.questionId,
-                                      questionAnswerText: opt.text,
-                                      questionAnswerIsCorrect: opt.isCorrect,
-                                      questionAnswerCreateTimestamp: "",
-                                      questionAnswerLastUpdateTimestamp: ""
-                                    }
-                                  ]
+                                  values: opt
+                                    ? [
+                                        {
+                                          questionId:
+                                            data.createQuestions.nodes[0]
+                                              .newQuestions.questionId,
+                                          questionAnswerText: opt.text,
+                                          questionAnswerIsCorrect:
+                                            opt.isCorrect,
+                                          questionAnswerCreateTimestamp: "",
+                                          questionAnswerLastUpdateTimestamp: ""
+                                        }
+                                      ]
+                                    : []
                                 }
                               }
                             )
