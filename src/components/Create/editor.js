@@ -14,6 +14,7 @@ import WrongIcon from "material-ui/svg-icons/content/clear";
 import firebase from "firebase";
 import { request } from "graphql-request";
 import Checkbox from "material-ui/Checkbox";
+const jsStringEscape = s => s;
 
 export default class Editor extends Component {
   props: {
@@ -211,9 +212,15 @@ $baseId: String
                         values: [
                           {
                             questionSetId: parseInt(this.props.qSetId),
-                            questionTitle: this.state.questionTitle,
-                            questionContent: this.state.questionText,
-                            questionType: this.state.questionType,
+                            questionTitle: jsStringEscape(
+                              this.state.questionTitle
+                            ),
+                            questionContent: jsStringEscape(
+                              this.state.questionText
+                            ),
+                            questionType: jsStringEscape(
+                              this.state.questionType
+                            ),
                             questionCreateTimestamp: "",
                             questionLastUpdateTimestamp: ""
                           }
@@ -242,7 +249,9 @@ $baseId: String
                                           questionId:
                                             data.createQuestions.nodes[0]
                                               .newQuestions.questionId,
-                                          questionAnswerText: opt.text,
+                                          questionAnswerText: jsStringEscape(
+                                            opt.text
+                                          ),
                                           questionAnswerIsCorrect:
                                             opt.isCorrect,
                                           questionAnswerCreateTimestamp: "",

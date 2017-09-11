@@ -80,57 +80,67 @@ class Followed extends Component {
             request(
               window.serverUrl,
               `
-            query getQuestion($offset: Int,$where: SequelizeJSON, $order: String, $limit: Int) {
-              questions(offset:$offset,where: $where, order: $order, limit: $limit) {
-                questionId
-                questionSet {
-                  questionSetId
-                  questionSetTitle
-                  questionSetIntro
-                  user {
-                    userId
-                    userName
-                    userPhotoUrl
-                    userIntro
-                    userFirebaseAuthId
+              query getQuestion($offset: Int, $where: SequelizeJSON, $order: String, $limit: Int) {
+                questions(offset: $offset, where: $where, order: $order, limit: $limit) {
+                  questionId
+                  questionSet {
+                    questionSetTitle
+                    questionSetIntro
+                    questionSetId
+                    user {
+                      userId
+                      userName
+                      userPhotoUrl
+                      userIntro
+                      userFirebaseAuthId
+                    }
                   }
-                }
-                questionTitle
-                questionContent
-                questionType
-                questionLastUpdateTimestamp
-                questionAnswers {
-                  edges {
-                    node {
-                      questionAnswerId
-                      questionAnswerText
-                      questionAnswerIsCorrect
-                      questionSumbits{
-                        total
+                  questionTitle
+                  questionContent
+                  questionType
+                  questionLastUpdateTimestamp
+                  questionAnswers {
+                    edges {
+                      node {
+                        questionAnswerId
+                        questionAnswerText
+                        questionAnswerIsCorrect
+                        questionSumbits {
+                          total
+                        }
                       }
                     }
                   }
-                }
-                questionComments {
-                  total
-                  edges {
-                    node {
-                      questionCommentId
-                      questionCommentContent
-                      questionCommentLastUpdateTimestamp
-                      user {
-                        userName
-                        userPhotoUrl
+                  questionComments {
+                    total
+                    edges {
+                      node {
+                        questionCommentId
+                        questionCommentContent
+                        questionCommentLastUpdateTimestamp
+                        user {
+                          userName
+                          userPhotoUrl
+                        }
                       }
                     }
                   }
-                }
-                questionReactions {
-                  total
+                  questionReactions {
+                    edges {
+                      node {
+                        questionReactionType
+                        user {
+                          userName
+                          userFirebaseAuthId
+                        }
+                      }
+                    }
+                    total
+                  }
                 }
               }
-            }
-            `,
+
+              `,
               {
                 where: {
                   questionSetId: {

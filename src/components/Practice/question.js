@@ -34,6 +34,7 @@ class Question extends Component {
     };
   }
   props: {
+    qSetTitle: string,
     lastUpdate: string,
     authorName: string,
     authorIntro: string,
@@ -74,7 +75,7 @@ class Question extends Component {
       <Card>
         <CardHeader
           title={this.props.authorName}
-          subtitle={this.props.authorIntro}
+          subtitle={"@" + this.props.qSetTitle}
           avatar={
             this.props.authorAvatar
               ? this.props.authorAvatar
@@ -86,32 +87,18 @@ class Question extends Component {
           subtitle={this.props.questionType}
         />
         <CardText>
-          <Paper>
-            <div
-              style={{
-                fontSize: "16px"
-              }}
-              dangerouslySetInnerHTML={{
-                __html: this.props.questionText.replace(
-                  /{{([^{}]*)}}/g,
-                  (match, p1) => {
-                    if (p1 === "") {
-                      return "<span style='text-decoration: underline'>______</span>";
-                    } else {
-                      return (
-                        "<span style='text-decoration: underline;'>_" +
-                        p1 +
-                        "_</span>"
-                      );
-                    }
-                  }
-                )
-              }}
-            />
-          </Paper>
+          <TextField
+            value={this.props.questionText}
+            multiLine={true}
+            disabled={true}
+            textareaStyle={{ color: "black" }}
+            fullWidth={true}
+            underlineShow={false}
+          />
           <OptionsList
             options={this.props.options}
             onOptionClick={this.handleOptionClick}
+            qId={this.props.qId}
           />
           <IntlProvider locale="en">
             <FormattedRelative value={this.props.lastUpdate} />
@@ -223,13 +210,15 @@ class Question extends Component {
           <FlatButton
             label={this.props.reactionsCount + " " + "Reactions"}
             disabled={this.state.disableReactions}
-            onTouchTap={e =>
+            onTouchTap={e => {
               firebase.auth().currentUser
                 ? this.setState({
                     openReactions: true,
                     anchorEl: e.currentTarget
                   })
-                : null}
+                : null;
+              e.preventDefault();
+            }}
           />
 
           <Popover
@@ -237,7 +226,7 @@ class Question extends Component {
             onRequestClose={() => this.setState({ openReactions: false })}
             anchorEl={this.state.anchorEl}
           >
-            <Menu>
+            <Menu style={{ position: "static" }}>
               {["DISLIKE", "EASY", "HARD", "LIKE", "NOSEE", "REPORT"].map(v =>
                 <MenuItem
                   primaryText={v}
@@ -313,6 +302,7 @@ class Question extends Component {
               })}
           />
           <Dialog
+            autoScrollBodyContent={true}
             title="Comments"
             open={this.state.openComments}
             onRequestClose={() => this.setState({ openComments: false })}
@@ -321,64 +311,66 @@ class Question extends Component {
                 ? <FlatButton
                     label="COMMENT"
                     onTouchTap={() => {
-                      this.setState({ openComments: false });
-                      firebase
-                        .auth()
-                        .currentUser.getToken(true)
-                        .catch(err => {
-                          console.log(err);
-                          this.getQuestionSet();
-                        })
-                        .then(authToken => {
-                          return request(
-                            window.serverUrl,
-                            `
-                      query getUserId($w:SequelizeJSON) {
-                        users (where:$w){
-                          userId
-                        }
+                      if (this.state.newComment) {
+                        this.setState({ openComments: false });
+                        firebase
+                          .auth()
+                          .currentUser.getToken(true)
+                          .catch(err => {
+                            console.log(err);
+                            this.getQuestionSet();
+                          })
+                          .then(authToken => {
+                            return request(
+                              window.serverUrl,
+                              `
+                    query getUserId($w:SequelizeJSON) {
+                      users (where:$w){
+                        userId
                       }
-                    `,
-                            {
-                              w: {
-                                userFirebaseAuthId: firebase.auth().currentUser
-                                  .uid
+                    }
+                  `,
+                              {
+                                w: {
+                                  userFirebaseAuthId: firebase.auth()
+                                    .currentUser.uid
+                                }
                               }
-                            }
-                          );
-                        })
-                        .then(data =>
-                          request(
-                            window.serverUrl,
-                            `
-                          mutation newComment($input:createQuestionCommentsInput!){
-                            createQuestionComments(input:$input){
-                              affectedCount
-                            }
+                            );
+                          })
+                          .then(data =>
+                            request(
+                              window.serverUrl,
+                              `
+                        mutation newComment($input:createQuestionCommentsInput!){
+                          createQuestionComments(input:$input){
+                            affectedCount
                           }
-                          `,
-                            {
-                              input: {
-                                values: [
-                                  {
-                                    userId: data.users[0].userId,
-                                    questionId: this.props.qId,
-                                    questionCommentCreateTimestamp: "",
-                                    questionCommentLastUpdateTimestamp: "",
-                                    questionCommentContent: this.state
-                                      .newComment
-                                  }
-                                ]
+                        }
+                        `,
+                              {
+                                input: {
+                                  values: [
+                                    {
+                                      userId: data.users[0].userId,
+                                      questionId: this.props.qId,
+                                      questionCommentCreateTimestamp: "",
+                                      questionCommentLastUpdateTimestamp: "",
+                                      questionCommentContent: this.state
+                                        .newComment
+                                    }
+                                  ]
+                                }
                               }
-                            }
+                            )
                           )
-                        )
-                        .catch(err => {
-                          console.log(err);
-                          window.alert(
-                            "Internal error, please try again later"
-                          );
-                        });
+                          .catch(err => {
+                            console.log(err);
+                            window.alert(
+                              "Internal error, please try again later"
+                            );
+                          });
+                      }
                     }}
                   />
                 : null,
@@ -400,6 +392,7 @@ class Question extends Component {
                   </Card>
                 </ListItem>
               )}
+
               {firebase.auth().currentUser
                 ? <TextField
                     value={this.state.newComment}
@@ -430,7 +423,8 @@ class Question extends Component {
                 actions={[
                   <FlatButton
                     label="DELETE"
-                    onTouchTap={() => {
+                    onTouchTap={e => {
+                      e.preventDefault();
                       window.confirm(
                         "Do you really want to delete this question?"
                       )

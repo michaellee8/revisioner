@@ -12,6 +12,7 @@ class OptionsList extends Component {
       questionAnswerIsCorrect: boolean,
       questionAnswerId: number
     }>,
+    qId: number,
     onOptionClick: Function
   };
   state: {
@@ -47,7 +48,7 @@ class OptionsList extends Component {
     return a;
   }
 
-  handleOptionClick(i: number, id: number) {
+  handleOptionClick(i: number, id: number, qid: number) {
     if (!this.state.selected) {
       this.selected = true;
       this.setState({
@@ -102,7 +103,91 @@ class OptionsList extends Component {
               }
             }
           )
-        );
+        )
+        .then(authToken => {
+          return request(
+            window.serverUrl,
+            `
+            query getUserId($w:SequelizeJSON) {
+              users (where:$w){
+                userId
+              }
+            }
+          `,
+            {
+              w: {
+                userFirebaseAuthId: firebase.auth().currentUser.uid
+              }
+            }
+          );
+        })
+        .then(data =>
+          request(
+            window.serverUrl,
+            `
+            mutation cancelReactions($input: deleteQuestionReactionsInput!) {
+              deleteQuestionReactions(input: $input) {
+                affectedCount
+              }
+            }
+
+            `,
+            {
+              input: {
+                where: {
+                  userId: data.users[0].userId,
+                  questionId: this.props.qId,
+                  questionReactionType: "VIEW"
+                }
+              }
+            }
+          )
+        )
+        .then(authToken => {
+          return request(
+            window.serverUrl,
+            `
+            query getUserId($w:SequelizeJSON) {
+              users (where:$w){
+                userId
+              }
+            }
+          `,
+            {
+              w: {
+                userFirebaseAuthId: firebase.auth().currentUser.uid
+              }
+            }
+          );
+        })
+        .then(data =>
+          request(
+            window.serverUrl,
+            `
+            mutation newReaction($input:createQuestionReactionsInput!){
+              createQuestionReactions(input:$input){
+                clientMutationId
+              }
+            }
+            `,
+            {
+              input: {
+                values: [
+                  {
+                    questionReactionType: "VIEW",
+                    userId: data.users[0].userId,
+                    questionReactionTimestamp: "",
+                    questionId: this.props.qId
+                  }
+                ]
+              }
+            }
+          )
+        )
+        .catch(err => {
+          console.log(err);
+          window.alert("Internal error, please try again later");
+        });
       this.props.onOptionClick(i);
     }
   }

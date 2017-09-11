@@ -41,13 +41,13 @@ class Practice extends Component {
           request(
             window.serverUrl,
             `
-            query getQuestion($offset: Int,$where: SequelizeJSON, $order: String, $limit: Int) {
-              questions(offset:$offset,where: $where, order: $order, limit: $limit) {
+            query getQuestion($offset: Int, $where: SequelizeJSON, $order: String, $limit: Int) {
+              questions(offset: $offset, where: $where, order: $order, limit: $limit) {
                 questionId
                 questionSet {
-                  questionSetId
                   questionSetTitle
                   questionSetIntro
+                  questionSetId
                   user {
                     userId
                     userName
@@ -66,7 +66,7 @@ class Practice extends Component {
                       questionAnswerId
                       questionAnswerText
                       questionAnswerIsCorrect
-                      questionSumbits{
+                      questionSumbits {
                         total
                       }
                     }
@@ -87,10 +87,20 @@ class Practice extends Component {
                   }
                 }
                 questionReactions {
+                  edges {
+                    node {
+                      questionReactionType
+                      user {
+                        userName
+                        userFirebaseAuthId
+                      }
+                    }
+                  }
                   total
                 }
               }
             }
+
             `,
             {
               where: {},
