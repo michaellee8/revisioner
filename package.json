@@ -11,12 +11,14 @@
     "material-ui": "^0.18.6",
     "re-base": "^3.0.3",
     "react": "^15.6.1",
+    "react-chartjs": "^0.8.0",
     "react-dom": "^15.6.1",
     "react-intl": "^2.4.0",
     "react-router-dom": "^4.1.2",
     "react-scripts": "1.0.10",
     "react-tap-event-plugin": "^2.0.1",
     "react-visibility-sensor": "^3.10.1",
+    "recharts": "^1.0.0-alpha.4",
     "whatwg-fetch": "^2.0.3"
   },
   "scripts": {
