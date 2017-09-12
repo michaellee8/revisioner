@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import GARoutes from "./GARoutes";
 import AccountButton from "./Account/account-button";
 import firebase from "firebase";
+import { withRouter } from "react-router-dom";
 
 class Nav extends Component {
   constructor(props) {
@@ -27,7 +28,7 @@ class Nav extends Component {
     return (
       <div>
         <AppBar
-          title="Revisioner"
+          title={this.props.location.pathname.substr(1) + "@Revisioner"}
           onLeftIconButtonTouchTap={this.handleToggle}
           iconElementRight={<AccountButton />}
         />
@@ -56,26 +57,36 @@ class Nav extends Component {
           >
             <MenuItem onTouchTap={this.handleClose}>Practice</MenuItem>
           </Link>
-          {firebase.auth().currentUser
-            ? <Link
-                to="/create"
-                style={{
-                  textDecoration: "none"
-                }}
-              >
-                <MenuItem onTouchTap={this.handleClose}>Create</MenuItem>
-              </Link>
-            : null}
-          {firebase.auth().currentUser
-            ? <Link
-                to="/followed"
-                style={{
-                  textDecoration: "none"
-                }}
-              >
-                <MenuItem onTouchTap={this.handleClose}>Followed</MenuItem>
-              </Link>
-            : null}
+          {firebase.auth().currentUser ? (
+            <Link
+              to="/create"
+              style={{
+                textDecoration: "none"
+              }}
+            >
+              <MenuItem onTouchTap={this.handleClose}>Create</MenuItem>
+            </Link>
+          ) : null}
+          {firebase.auth().currentUser ? (
+            <Link
+              to="/followed"
+              style={{
+                textDecoration: "none"
+              }}
+            >
+              <MenuItem onTouchTap={this.handleClose}>Followed</MenuItem>
+            </Link>
+          ) : null}
+          {firebase.auth().currentUser ? (
+            <Link
+              to="/stats"
+              style={{
+                textDecoration: "none"
+              }}
+            >
+              <MenuItem onTouchTap={this.handleClose}>Your Stats</MenuItem>
+            </Link>
+          ) : null}
           <Link
             to="/about"
             style={{
@@ -91,4 +102,4 @@ class Nav extends Component {
   }
 }
 
-export default Nav;
+export default withRouter(Nav);
