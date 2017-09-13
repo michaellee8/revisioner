@@ -14,7 +14,7 @@ import {
   CardHeader
 } from "material-ui/Card";
 import { request } from "graphql-request";
-import { PieChart, Pie, Legend, Tooltip } from "recharts";
+import { PieChart, Pie, Legend, Tooltip, Cell } from "recharts";
 const VisibilitySensor = require("react-visibility-sensor");
 
 export default class Stats extends React.Component {
@@ -77,6 +77,7 @@ export default class Stats extends React.Component {
         <List>
           <ListItem disable={true}>
             <Card>
+              <CardTitle title="Summary" />
               <CardText>
                 <PieChart width={600} height={600}>
                   <Pie
@@ -88,7 +89,8 @@ export default class Stats extends React.Component {
                             (v.questionAnswer.questionAnswerIsCorrect ? 1 : 0) +
                             s,
                           0
-                        )
+                        ),
+                        label: "✓"
                       },
                       {
                         name: "Wrong",
@@ -98,7 +100,8 @@ export default class Stats extends React.Component {
                               ? 1
                               : 0) + s,
                           0
-                        )
+                        ),
+                        label: "✗"
                       }
                     ]}
                     width={400}
@@ -106,14 +109,26 @@ export default class Stats extends React.Component {
                     cx={300}
                     cy={300}
                     fill="#111188"
-                  />
+                    label={({
+                      cx,
+                      cy,
+                      midAngle,
+                      innerRadius,
+                      outerRadius,
+                      percent,
+                      index
+                    }) => (index === 0 ? "✓" : "✗")}
+                  >
+                    <Cell fill="#22D322" />
+                    <Cell fill="#FF2222" />
+                  </Pie>
                   <Tooltip />
                 </PieChart>
               </CardText>
             </Card>
           </ListItem>
 
-          {this.state.stats.map(v =>
+          {this.state.stats.map(v => (
             <ListItem disable={true}>
               <Card>
                 <CardHeader
@@ -137,12 +152,12 @@ export default class Stats extends React.Component {
                       disabled={true}
                       primaryText={
                         <div>
-                          {v.questionAnswer.questionAnswerIsCorrect
-                            ? <CorrectIcon />
-                            : <WrongIcon />}
-                          <span>
-                            {v.questionAnswer.questionAnswerText}
-                          </span>
+                          {v.questionAnswer.questionAnswerIsCorrect ? (
+                            <CorrectIcon />
+                          ) : (
+                            <WrongIcon />
+                          )}
+                          <span>{v.questionAnswer.questionAnswerText}</span>
                         </div>
                       }
                     />
@@ -150,7 +165,7 @@ export default class Stats extends React.Component {
                 </CardText>
               </Card>
             </ListItem>
-          )}
+          ))}
         </List>
       </div>
     );

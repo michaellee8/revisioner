@@ -13,12 +13,17 @@ import CreateIcon from "material-ui/svg-icons/image/edit";
 import FollowedIcon from "material-ui/svg-icons/action/chrome-reader-mode";
 import StatsIcon from "material-ui/svg-icons/editor/insert-chart";
 import AboutIcon from "material-ui/svg-icons/action/info";
+import {
+  BottomNavigation,
+  BottomNavigationItem
+} from "material-ui/BottomNavigation";
 
 class Nav extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: false
+      open: false,
+      index: 0
     };
   }
   handleToggle = () =>
@@ -65,51 +70,45 @@ class Nav extends Component {
               Practice
             </MenuItem>
           </Link>
-          {firebase.auth().currentUser
-            ? <Link
-                to="/create"
-                style={{
-                  textDecoration: "none"
-                }}
+          {firebase.auth().currentUser ? (
+            <Link
+              to="/create"
+              style={{
+                textDecoration: "none"
+              }}
+            >
+              <MenuItem onTouchTap={this.handleClose} leftIcon={<CreateIcon />}>
+                Create
+              </MenuItem>
+            </Link>
+          ) : null}
+          {firebase.auth().currentUser ? (
+            <Link
+              to="/followed"
+              style={{
+                textDecoration: "none"
+              }}
+            >
+              <MenuItem
+                onTouchTap={this.handleClose}
+                leftIcon={<FollowedIcon />}
               >
-                <MenuItem
-                  onTouchTap={this.handleClose}
-                  leftIcon={<CreateIcon />}
-                >
-                  Create
-                </MenuItem>
-              </Link>
-            : null}
-          {firebase.auth().currentUser
-            ? <Link
-                to="/followed"
-                style={{
-                  textDecoration: "none"
-                }}
-              >
-                <MenuItem
-                  onTouchTap={this.handleClose}
-                  leftIcon={<FollowedIcon />}
-                >
-                  Followed
-                </MenuItem>
-              </Link>
-            : null}
-          {firebase.auth().currentUser
-            ? <Link
-                to="/stats"
-                style={{
-                  textDecoration: "none"
-                }}
-              >
-                <MenuItem
-                  onTouchTap={this.handleClose}
-                  leftIcon={<StatsIcon />}
-                >
-                  Your Stats
-                </MenuItem>
-              </Link>
-            : null}
+                Followed
+              </MenuItem>
+            </Link>
+          ) : null}
+          {firebase.auth().currentUser ? (
+            <Link
+              to="/stats"
+              style={{
+                textDecoration: "none"
+              }}
+            >
+              <MenuItem onTouchTap={this.handleClose} leftIcon={<StatsIcon />}>
+                Stats
+              </MenuItem>
+            </Link>
+          ) : null}
           <Link
             to="/about"
             style={{
@@ -122,6 +121,76 @@ class Nav extends Component {
           </Link>
         </Drawer>
         <GARoutes />
+        <div>
+          <BottomNavigation selectedIndex={this.state.index}>
+            <Link
+              to="/practice"
+              style={{
+                textDecoration: "none"
+              }}
+            >
+              <BottomNavigationItem
+                onTouchTap={() => this.setState({ index: 0 })}
+                icon={<PracticeIcon />}
+                label="Practice"
+              />
+            </Link>
+            {firebase.auth().currentUser ? (
+              <Link
+                to="/create"
+                style={{
+                  textDecoration: "none"
+                }}
+              >
+                <BottomNavigationItem
+                  onTouchTap={() => this.setState({ index: 1 })}
+                  icon={<CreateIcon />}
+                  label="Create"
+                />
+              </Link>
+            ) : null}
+            {firebase.auth().currentUser ? (
+              <Link
+                to="/followed"
+                style={{
+                  textDecoration: "none"
+                }}
+              >
+                <BottomNavigationItem
+                  onTouchTap={() => this.setState({ index: 2 })}
+                  icon={<FollowedIcon />}
+                  label="Followed"
+                />
+              </Link>
+            ) : null}
+            {firebase.auth().currentUser ? (
+              <Link
+                to="/stats"
+                style={{
+                  textDecoration: "none"
+                }}
+              >
+                <BottomNavigationItem
+                  onTouchTap={() => this.setState({ index: 3 })}
+                  icon={<StatsIcon />}
+                  label="Stats"
+                />
+              </Link>
+            ) : null}
+            <Link
+              to="/about"
+              style={{
+                textDecoration: "none"
+              }}
+            >
+              <BottomNavigationItem
+                onTouchTap={() => this.setState({ index: 4 })}
+                icon={<AboutIcon />}
+                label="About"
+              />
+            </Link>
+          </BottomNavigation>
+        </div>
       </div>
     );
   }
