@@ -16,7 +16,7 @@ import {
 import { request } from "graphql-request";
 import { PieChart, Pie, Legend, Tooltip, Cell } from "recharts";
 const VisibilitySensor = require("react-visibility-sensor");
-
+const RADIAN = Math.PI / 180;
 export default class Stats extends React.Component {
   constructor(props) {
     super(props);
@@ -79,7 +79,7 @@ export default class Stats extends React.Component {
             <Card>
               <CardTitle title="Summary" />
               <CardText>
-                <PieChart width={600} height={600}>
+                <PieChart width={300} height={300}>
                   <Pie
                     data={[
                       {
@@ -89,8 +89,7 @@ export default class Stats extends React.Component {
                             (v.questionAnswer.questionAnswerIsCorrect ? 1 : 0) +
                             s,
                           0
-                        ),
-                        label: "✓"
+                        )
                       },
                       {
                         name: "Wrong",
@@ -100,14 +99,14 @@ export default class Stats extends React.Component {
                               ? 1
                               : 0) + s,
                           0
-                        ),
-                        label: "✗"
+                        )
                       }
                     ]}
-                    width={400}
-                    height={400}
-                    cx={300}
-                    cy={300}
+                    width={200}
+                    height={200}
+                    cx={150}
+                    cy={150}
+                    labelLine={false}
                     fill="#111188"
                     label={({
                       cx,
@@ -117,7 +116,69 @@ export default class Stats extends React.Component {
                       outerRadius,
                       percent,
                       index
-                    }) => (index === 0 ? "✓" : "✗")}
+                    }) => {
+                      const radius =
+                        innerRadius + (outerRadius - innerRadius) * 0.5;
+                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                      return (
+                        <text
+                          x={x}
+                          y={y}
+                          fill="white"
+                          textAnchor={x > cx ? "start" : "end"}
+                          dominantBaseline="central"
+                          scaleToFit={true}
+                          width={1000}
+                        >
+                          {[
+                            {
+                              name: "Correct",
+                              value: this.state.stats.reduce(
+                                (s, v) =>
+                                  (v.questionAnswer.questionAnswerIsCorrect
+                                    ? 1
+                                    : 0) + s,
+                                0
+                              )
+                            },
+                            {
+                              name: "Wrong",
+                              value: this.state.stats.reduce(
+                                (s, v) =>
+                                  (!v.questionAnswer.questionAnswerIsCorrect
+                                    ? 1
+                                    : 0) + s,
+                                0
+                              )
+                            }
+                          ][index].name +
+                            " " +
+                            [
+                              {
+                                name: "Correct",
+                                value: this.state.stats.reduce(
+                                  (s, v) =>
+                                    (v.questionAnswer.questionAnswerIsCorrect
+                                      ? 1
+                                      : 0) + s,
+                                  0
+                                )
+                              },
+                              {
+                                name: "Wrong",
+                                value: this.state.stats.reduce(
+                                  (s, v) =>
+                                    (!v.questionAnswer.questionAnswerIsCorrect
+                                      ? 1
+                                      : 0) + s,
+                                  0
+                                )
+                              }
+                            ][index].value}
+                        </text>
+                      );
+                    }}
                   >
                     <Cell fill="#22D322" />
                     <Cell fill="#FF2222" />

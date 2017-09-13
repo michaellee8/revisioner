@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Drawer from "material-ui/Drawer";
+import Paper from "material-ui/Paper";
 import MenuItem from "material-ui/MenuItem";
 import AppBar from "material-ui/AppBar";
 import { Link } from "react-router-dom";
@@ -122,74 +123,85 @@ class Nav extends Component {
         </Drawer>
         <GARoutes />
         <div>
-          <BottomNavigation selectedIndex={this.state.index}>
-            <Link
-              to="/practice"
-              style={{
-                textDecoration: "none"
-              }}
-            >
+          <Paper zDepth={1} style={{ position: "fixed", bottom: 0 }}>
+            <BottomNavigation selectedIndex={this.state.index}>
               <BottomNavigationItem
-                onTouchTap={() => this.setState({ index: 0 })}
+                onTouchTap={() =>
+                  this.setState({ index: 0 }, () => {
+                    this.props.history.push("/practice");
+                  })}
                 icon={<PracticeIcon />}
                 label="Practice"
               />
-            </Link>
-            {firebase.auth().currentUser ? (
-              <Link
-                to="/create"
-                style={{
-                  textDecoration: "none"
-                }}
-              >
+
+              {firebase.auth().currentUser ? (
                 <BottomNavigationItem
-                  onTouchTap={() => this.setState({ index: 1 })}
+                  onTouchTap={() =>
+                    this.setState({ index: 1 }, () => {
+                      this.props.history.push("/create");
+                    })}
                   icon={<CreateIcon />}
                   label="Create"
                 />
-              </Link>
-            ) : null}
-            {firebase.auth().currentUser ? (
-              <Link
-                to="/followed"
-                style={{
-                  textDecoration: "none"
-                }}
-              >
+              ) : (
                 <BottomNavigationItem
-                  onTouchTap={() => this.setState({ index: 2 })}
+                  onTouchTap={() =>
+                    this.setState({ index: 1 }, () => {
+                      this.props.history.push("/create");
+                    })}
+                  icon={<CreateIcon />}
+                  label="Create"
+                />
+              )}
+              {firebase.auth().currentUser ? (
+                <BottomNavigationItem
+                  onTouchTap={() =>
+                    this.setState({ index: 2 }, () => {
+                      this.props.history.push("/followed");
+                    })}
                   icon={<FollowedIcon />}
                   label="Followed"
                 />
-              </Link>
-            ) : null}
-            {firebase.auth().currentUser ? (
-              <Link
-                to="/stats"
-                style={{
-                  textDecoration: "none"
-                }}
-              >
+              ) : (
                 <BottomNavigationItem
-                  onTouchTap={() => this.setState({ index: 3 })}
+                  onTouchTap={() =>
+                    this.setState({ index: 2 }, () => {
+                      this.props.history.push("/followed");
+                    })}
+                  icon={<FollowedIcon />}
+                  label="Followed"
+                />
+              )}
+              {firebase.auth().currentUser ? (
+                <BottomNavigationItem
+                  onTouchTap={() =>
+                    this.setState({ index: 3 }, () => {
+                      this.props.history.push("/stats");
+                    })}
                   icon={<StatsIcon />}
                   label="Stats"
                 />
-              </Link>
-            ) : null}
-            <Link
-              to="/about"
-              style={{
-                textDecoration: "none"
-              }}
-            >
+              ) : (
+                <BottomNavigationItem
+                  onTouchTap={() =>
+                    this.setState({ index: 3 }, () => {
+                      this.props.history.push("/stats");
+                    })}
+                  icon={<StatsIcon />}
+                  label="Stats"
+                />
+              )}
+
               <BottomNavigationItem
-                onTouchTap={() => this.setState({ index: 4 })}
+                onTouchTap={() =>
+                  this.setState({ index: 4 }, () => {
+                    this.props.history.push("/about");
+                  })}
                 icon={<AboutIcon />}
                 label="About"
               />
-            </Link>
-          </BottomNavigation>
+            </BottomNavigation>
+          </Paper>
         </div>
       </div>
     );
