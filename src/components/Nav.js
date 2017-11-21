@@ -98,6 +98,16 @@ class Nav extends Component {
               </MenuItem>
             </Link>
           ) : null}
+          <Link
+            to="/quiz"
+            style={{
+              textDecoration: "none"
+            }}
+          >
+            <MenuItem onTouchTap={this.handleClose} leftIcon={<PracticeIcon />}>
+              Quiz
+            </MenuItem>
+          </Link>
           {firebase.auth().currentUser ? (
             <Link
               to="/stats"
